@@ -23,7 +23,7 @@ class CartItemViewSet(ModelViewSet):
         print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>get_queryset")
         return queryset
 
-    def update(self, request) -> Response:
+    def update(self, request: Request, *args, **kwargs) -> Response:
         product_id = request.data["id"]
         count = request.data["count"]
 
@@ -35,7 +35,7 @@ class CartItemViewSet(ModelViewSet):
 
         cart_item.save()
 
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!create")
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!update")
         print(product_id, count)
 
         cart_items = CartItem.objects.filter(cart=cart)
@@ -43,11 +43,31 @@ class CartItemViewSet(ModelViewSet):
 
         return Response(serializer.data, status=201)
 
-    def list(self, request: Request) -> Response:
+    def list(self, request: Request, *args, **kwargs) -> Response:
         data = self.get_serializer(self.get_queryset(), many=True).data
         print("!!!!!!!!!!!!!!!!!!!!!!!cart_list")
         return Response(data)
 
-    def destroy(self, request, id):
-        pass
+    def destroy(self, request: Request, *args, **kwargs):
+        product_id = request.data["id"]
+        count = request.data["count"]
+
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        product = Product.objects.get(id=product_id)
+
+        cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+
+        if cart_item.count > count:
+            cart_item.count -= count
+            cart_item.save()
+        else:
+            cart_item.delete()
+
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!delete")
+        print(product_id, count)
+
+        cart_items = CartItem.objects.filter(cart=cart)
+        serializer = self.get_serializer(cart_items, many=True)
+
+        return Response(serializer.data, status=201)
 

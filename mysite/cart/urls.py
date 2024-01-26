@@ -15,5 +15,6 @@ urlpatterns = [
     path("", include(routers.urls)),
     path("basket", CartItemViewSet.as_view({'get': 'list',
                                             'post': 'update',
+                                            'delete': 'destroy',
                                             })),
 ]
