@@ -1,0 +1,8 @@
+asgiref==3.7.2
+diploma-frontend @ file:///Users/svetlanaskobeltcyna/PycharmProjects/Skillbox/python_django_diploma/diploma-frontend/dist/diploma-frontend-0.6.tar.gz#sha256=ac518af82303dfc0a01cc48ec720e59a19c68caef3700ab09f145099a96574ed
+Django==5.0.1
+djangorestframework==3.14.0
+pillow==10.2.0
+pytz==2023.3.post1
+sqlparse==0.4.4
+typing_extensions==4.9.0
