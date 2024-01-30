@@ -31,7 +31,7 @@ class CartItemViewSet(ModelViewSet):
         product = Product.objects.get(id=product_id)
 
         cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
-        cart_item.count += count
+        cart_item.count += int(count)
 
         cart_item.save()
 
@@ -41,12 +41,12 @@ class CartItemViewSet(ModelViewSet):
         cart_items = CartItem.objects.filter(cart=cart)
         serializer = self.get_serializer(cart_items, many=True)
 
-        return Response(serializer.data, status=201)
+        return Response(serializer.data, )
 
     def list(self, request: Request, *args, **kwargs) -> Response:
-        data = self.get_serializer(self.get_queryset(), many=True).data
+        serializer = self.get_serializer(self.get_queryset(), many=True)
         print("!!!!!!!!!!!!!!!!!!!!!!!cart_list")
-        return Response(data)
+        return Response(serializer.data)
 
     def destroy(self, request: Request, *args, **kwargs):
         product_id = request.data["id"]
@@ -69,5 +69,5 @@ class CartItemViewSet(ModelViewSet):
         cart_items = CartItem.objects.filter(cart=cart)
         serializer = self.get_serializer(cart_items, many=True)
 
-        return Response(serializer.data, status=201)
+        return Response(serializer.data)
 

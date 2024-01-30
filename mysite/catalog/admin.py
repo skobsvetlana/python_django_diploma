@@ -1,15 +1,15 @@
 from django.contrib import admin
-from  django.db.models import QuerySet
+from django.db.models import QuerySet
 from django.http import HttpRequest
 from django.contrib.auth.models import User
 from catalog.models import (Product,
-                     Category,
-                     Tag,
-                     Review,
-                     Images,
-                     Specification,
-                     SaleItem,
-                     )
+                            Category,
+                            Tag,
+                            Review,
+                            Images,
+                            Specification,
+                            SaleItem,
+                            )
 
 
 @admin.action(description="limited_addition ON")
@@ -25,14 +25,18 @@ def limited_addition_off(modelAdmin: admin.ModelAdmin, request: HttpRequest, que
 class TagInline(admin.TabularInline):
     model = Product.tags.through
 
+
 class SpecificationInline(admin.TabularInline):
     model = Product.specifications.through
+
 
 class ImagesInline(admin.StackedInline):
     model = Images
 
+
 class SaleItemInline(admin.StackedInline):
     model = SaleItem
+
 
 class ReviewInline(admin.StackedInline):
     model = Review
@@ -57,6 +61,7 @@ class ProductAdmin(admin.ModelAdmin):
                     "price",
                     "totalCount",
                     "description",
+                    "free_delivery",
                     "limited_edition",
                     ]
     list_display_links = "pk", "title"
@@ -68,7 +73,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = "pk", "title", "category_id"
+    list_display = "pk", "title", "category_id", "src", "alt"
     list_display_links = "pk", "title"
 
 
@@ -88,18 +93,3 @@ class SpecificationAdmin(admin.ModelAdmin):
 class ReviewAdmin(admin.ModelAdmin):
     list_display = "pk", "author", "product", "text", "rate", "date",
     list_display_links = "pk", "product", "text"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

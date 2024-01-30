@@ -10,6 +10,11 @@ def product_images_directory_path(instance: "Images", filename: str) -> str:
         filename=filename
     )
 
+def category_directory_path(instance: "Category", filename: str) -> str:
+    return "categories/category_{pk}/{filename}".format(
+        pk=instance.pk,
+        filename=filename
+    )
 
 class Category(models.Model):
     class Meta:
@@ -17,6 +22,8 @@ class Category(models.Model):
         verbose_name_plural = "Categories"
 
     title = models.CharField(max_length=150, null=False)
+    src = models.ImageField(default="pics/daisy.jpeg", upload_to=category_directory_path)
+    alt = models.CharField(max_length=200, null=False, blank=True)
     category_id = models.PositiveIntegerField(default=0)
 
     def __str__(self):
@@ -66,13 +73,24 @@ class Product(models.Model):
     def get_absolute_url(self):
         return reverse('shopapp:product_detail', kwargs={'pk': self.pk})
 
+    def num_of_reviews(self):
+        return Review.objects.filter(product=self).count()
+
+    def average_rating(self):
+        rating = Review.objects.filter(product=self).aggregate(models.Avg('rate'))['rate__avg']
+        if rating:
+            rating = round(rating, 1)
+        return rating
+
+
 
 class Review(models.Model):
     author = models.ForeignKey(User, on_delete=models.PROTECT)
     text = models.TextField(null=False, blank=True)
     rate = models.PositiveSmallIntegerField(null=False, blank=False, default=0)
     date = models.DateTimeField(auto_now_add=True)
-    product = models.ForeignKey(Product, on_delete=models.PROTECT, null=False, blank=False, related_name="reviews")
+    email = models.EmailField(null=True, blank=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=False, blank=False, related_name="reviews")
 
 
 class Images(models.Model):

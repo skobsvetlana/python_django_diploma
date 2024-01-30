@@ -1,3 +1,6 @@
+from collections import OrderedDict
+
+from rest_framework import pagination, status
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.viewsets import ModelViewSet
@@ -7,17 +10,31 @@ from catalog.serializers import (ProductFullSerializer,
                                  CategorySerializer,
                                  TagSerializer,
                                  SaleItemSerializer,
+                                 CatalogItemSerializer,
                                  )
 from catalog.models import Product, Tag, Category, SaleItem
 
 from django.shortcuts import get_object_or_404
 
-class CatalogItemViewSet(ModelViewSet):
-    serializer_class = ProductFullSerializer
+class CatalogPagination(pagination.PageNumberPagination):
+    page_size = 20
+    max_page_size = 50
+
+    def get_paginated_response(self, data):
+        return Response(OrderedDict((
+            ('items', data),
+            ('currentPage', self.page.number),
+            ('lastPage', self.page.paginator.count),
+        )))
+
+
+class CatalogViewSet(ModelViewSet):
+    serializer_class = CatalogItemSerializer
     queryset = (
         Product.objects
         .prefetch_related("tags", "specifications", "images", "reviews", ).all()
     )
+    pagination_class = CatalogPagination
 
     def get_queryset(self, *args, **kwargs):
         minPrice = self.request.GET["filter[minPrice]"]
@@ -39,20 +56,20 @@ class CatalogItemViewSet(ModelViewSet):
         if freeDelivery == "true":
             queryset = queryset.filter(free_delivery=True)
 
+        print("freeDelivery=", freeDelivery)
         return queryset
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request: Request, *args, **kwargs) -> Response:
         queryset = self.get_queryset()
-        items = self.get_serializer(queryset, many=True).data
-        print("++++++++++++++++++++++++catalog_item_list")
-        print(len(items))
-        return Response(items)
-
-    def retrieve(self, request, id, **kwargs):
-        item = get_object_or_404(self.queryset, pk=id)
-        serializer = self.get_serializer(item)
-        print("++++++++++++++++++++++++cart_item_retrieve")
-        return Response(serializer.data)
+        # page = request.GET.get('page')
+        if queryset.exists():
+            page = self.paginate_queryset(queryset)
+            if page:
+                data = self.get_serializer(page, many=True).data
+                print("++++++++++++++++++++++++catalog_item_list")
+                print(len(data))
+                return self.get_paginated_response(data)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class ProductFullViewSet(ModelViewSet):
@@ -62,7 +79,7 @@ class ProductFullViewSet(ModelViewSet):
     )
     serializer_class = ProductFullSerializer
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request: Request, *args, **kwargs) -> Response:
         items = self.get_serializer(self.queryset, many=True)
         print("++++++++++++++++++++++++productfull_list")
         return Response(items.data)
@@ -92,7 +109,7 @@ class ProductViewSet(ModelViewSet):
     # filter(gender='MALE', price__range=(10, 50))
     serializer_class = ProductSerializer
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request: Request, *args, **kwargs) -> Response:
         items = self.get_serializer(self.queryset, many=True).data
 
         return Response(items)
@@ -113,10 +130,3 @@ class CategoryViewSet(ModelViewSet):
 class TagViewSet(ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-
-
-
-
-
-
-
