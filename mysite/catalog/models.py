@@ -67,21 +67,22 @@ class Product(models.Model):
         else:
             return self.fullDescription[:50] + "..."
 
-    def __str__(self) -> str:
-        return self.title
-
-    def get_absolute_url(self):
-        return reverse('shopapp:product_detail', kwargs={'pk': self.pk})
-
-    def num_of_reviews(self):
+    @property
+    def reviews(self):
         return Review.objects.filter(product=self).count()
 
-    def average_rating(self):
+    @property
+    def rating(self):
         rating = Review.objects.filter(product=self).aggregate(models.Avg('rate'))['rate__avg']
         if rating:
             rating = round(rating, 1)
         return rating
 
+    def __str__(self) -> str:
+        return self.title
+
+    def get_absolute_url(self):
+        return reverse('shopapp:product_detail', kwargs={'pk': self.pk})
 
 
 class Review(models.Model):

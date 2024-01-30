@@ -62,7 +62,8 @@ class ProductFullSerializer(serializers.ModelSerializer):
     specifications = SpecificationsSerializer(many=True, required=False)
     tags = TagSerializer(many=True, required=False)
     count = serializers.SerializerMethodField(method_name="get_count")
-    rating = serializers.SerializerMethodField(method_name="get_average_rating")
+    price = serializers.SerializerMethodField(method_name="get_price")
+    date = serializers.SerializerMethodField(method_name="date_to_string")
 
     class Meta:
         model = Product
@@ -86,8 +87,11 @@ class ProductFullSerializer(serializers.ModelSerializer):
     def get_count(self, product: Product):
             return product.totalCount
 
-    def get_average_rating(self, product: Product):
-        return product.average_rating()
+    def get_price(self, product: Product):
+        return float(product.price)
+
+    def date_to_string(self, product: Product):
+        return product.date.strftime("%a %b %d %Y %H:%M:%S GMT%z %Z")
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -117,17 +121,9 @@ class SaleItemSerializer(serializers.ModelSerializer):
         ]
 
 
-class ProductRateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Review
-        fields = ["rate",]
-
-
 class CatalogItemSerializer(serializers.ModelSerializer):
     images = ImagesSerializer(many=True, required=False)
     tags = TagSerializer(many=True, required=False)
-    rating = serializers.SerializerMethodField(method_name="get_average_rating")
-    reviews = serializers.SerializerMethodField(method_name="get_reviews_count")
     count = serializers.SerializerMethodField(method_name="get_count")
     price = serializers.SerializerMethodField(method_name="get_price")
     freeDelivery = serializers.SerializerMethodField(method_name="get_freeDelivery")
@@ -161,12 +157,6 @@ class CatalogItemSerializer(serializers.ModelSerializer):
 
     def get_freeDelivery(self, product: Product):
         return product.free_delivery
-
-    def get_reviews_count(self, product: Product):
-        return product.num_of_reviews()
-
-    def get_average_rating(self, product: Product):
-        return product.average_rating()
 
 
 class CategorySerializer(serializers.ModelSerializer):
