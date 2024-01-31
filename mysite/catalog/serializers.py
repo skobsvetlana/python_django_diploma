@@ -159,6 +159,14 @@ class CatalogItemSerializer(serializers.ModelSerializer):
         return product.free_delivery
 
 
+class CatalogSerializer(serializers.ModelSerializer):
+    items = CatalogItemSerializer(many=True, required=False)
+
+    class Meta:
+        model = Product
+        fields = ["items"]
+
+
 class CategorySerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(method_name="get_image")
     subcategory = serializers.SerializerMethodField(method_name="get_subcategory")
