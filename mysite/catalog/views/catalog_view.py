@@ -19,7 +19,7 @@ class CatalogPagination(pagination.PageNumberPagination):
         return Response(OrderedDict((
             ('items', data),
             ('currentPage', self.page.number),
-            ('lastPage', self.page.paginator.count),
+            ('lastPage', self.page.paginator.num_pages),
         )))
 
 
@@ -39,11 +39,13 @@ class CatalogViewSet(ModelViewSet):
         freeDelivery = self.request.GET["filter[freeDelivery]"]
         sort = self.request.GET["sort"]
         limit = self.request.GET["limit"]
-        order = self.request.GET["sort"]
+
+        if sortType == 'dec':
+            sort = f'-{sort}'
 
         queryset = (self.queryset
                     .filter(price__gte=float(minPrice), price__lte=float(maxPrice))
-                    .order_by("price"))
+                    .order_by(sort))
 
         if available == "true":
             queryset = queryset.filter(totalCount__gt=0)
