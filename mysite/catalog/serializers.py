@@ -74,13 +74,13 @@ class ProductFullSerializer(serializers.ModelSerializer):
             "count",
             "date",
             "title",
-            "fullDescription",
             "description",
+            "fullDescription",
             "free_delivery",
-            "tags",
-            "specifications",
             "images",
+            "tags",
             "reviews",
+            "specifications",
             "rating",
         ]
 
@@ -128,6 +128,7 @@ class CatalogItemSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField(method_name="get_price")
     freeDelivery = serializers.SerializerMethodField(method_name="get_freeDelivery")
     date = serializers.SerializerMethodField(method_name="date_to_string")
+    reviews = serializers.SerializerMethodField(method_name="get_reviews")
 
     class Meta:
         model = Product
@@ -157,6 +158,9 @@ class CatalogItemSerializer(serializers.ModelSerializer):
 
     def get_freeDelivery(self, product: Product):
         return product.free_delivery
+
+    def get_reviews(self, product: Product):
+        return product.reviews_count
 
 
 class CatalogSerializer(serializers.ModelSerializer):

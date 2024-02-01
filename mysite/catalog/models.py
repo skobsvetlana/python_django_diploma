@@ -68,8 +68,11 @@ class Product(models.Model):
             return self.fullDescription[:50] + "..."
 
     @property
-    def reviews(self):
-        return Review.objects.filter(product=self).count()
+    def reviews_count(self):
+        reviews = Review.objects.filter(product=self)
+        if reviews:
+            return reviews.count()
+        return None
 
     @property
     def rating(self):
