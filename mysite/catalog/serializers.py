@@ -94,7 +94,7 @@ class ProductFullSerializer(serializers.ModelSerializer):
         return product.date.strftime("%a %b %d %Y %H:%M:%S GMT%z %Z")
 
 
-class ProductSerializer(serializers.ModelSerializer):
+class ProductShortSerializer(serializers.ModelSerializer):
     images = ImagesSerializer(many=True, required=False)
 
     class Meta:
@@ -103,22 +103,39 @@ class ProductSerializer(serializers.ModelSerializer):
             "id",
             "title",
             "price",
-            "category",
             "images",
         ]
 
 
 class SaleItemSerializer(serializers.ModelSerializer):
-    product = ProductFullSerializer(many=False, required=False)
+    images = ImagesSerializer(many=True, required=False)
+    id = serializers.CharField(source='product.id')
+    price = serializers.FloatField(source='product.price')
+    title = serializers.CharField(source='product.title')
+    salePrice = serializers.SerializerMethodField(method_name="get_salePrice")
+    dateFrom = serializers.SerializerMethodField(method_name="get_dateFrom")
+    dateTo = serializers.SerializerMethodField(method_name="get_dateTo")
 
     class Meta:
         model = SaleItem
         fields = [
-            "product",
+            "id",
+            "price",
             "salePrice",
             "dateFrom",
             "dateTo",
+            "title",
+            "images",
         ]
+
+    def get_salePrice(self, item: SaleItem):
+        return float(item.salePrice)
+
+    def get_dateFrom(self, item: SaleItem):
+        return item.dateFrom.strftime("%a %b %d %Y %H:%M:%S GMT%z %Z")
+
+    def get_dateTo(self, item: SaleItem):
+        return item.dateTo.strftime("%a %b %d %Y %H:%M:%S GMT%z %Z")
 
 
 class CatalogItemSerializer(serializers.ModelSerializer):
@@ -188,6 +205,10 @@ class CategorySerializer(serializers.ModelSerializer):
     #     category = Category.objects.get(instance)
     #     if category.category_id == 0:
     #         return super().to_representation(instance)
+
+    # def to_representation(self, value):
+    #     duration = time.strftime('%M:%S', time.gmtime(value.duration))
+    #     return 'Track %d: %s (%s)' % (value.order, value.name, duration)
 
     def get_image(self, category: Category):
         print(category.src)

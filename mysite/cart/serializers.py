@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from catalog.serializers import ProductSerializer
+from catalog.serializers import ProductShortSerializer
 
 from rest_framework import serializers
 
@@ -32,7 +32,7 @@ class CartItemSerializer(serializers.ModelSerializer):
     #     return cart_item.product.pk
 
     def to_representation(self, instance):
-        data = ProductSerializer(instance.product).data
+        data = ProductShortSerializer(instance.product).data
         data['count'] = instance.count
         return data
 
