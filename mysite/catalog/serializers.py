@@ -108,7 +108,7 @@ class ProductShortSerializer(serializers.ModelSerializer):
 
 
 class SaleItemSerializer(serializers.ModelSerializer):
-    images = ImagesSerializer(many=True, required=False)
+    images = ImagesSerializer(required=False, source="product.images", many=True)
     id = serializers.CharField(source='product.id')
     price = serializers.FloatField(source='product.price')
     title = serializers.CharField(source='product.title')
