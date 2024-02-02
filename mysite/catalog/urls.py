@@ -25,8 +25,10 @@ routers.register("banners", BannersViewSet)
 
 urlpatterns = [
     path("", include(routers.urls)),
+    path("product/<int:id>", ProductDetailViewSet.as_view({'get': 'retrieve'}), name='product_detail'),
     path("product/<int:id>/", ProductDetailViewSet.as_view({'get': 'retrieve'}), name='product_detail'),
-    path("product/<int:id>/review/", ReviewViewSet.as_view({'post': 'create'}), name='product_review'),
+    path("product/<int:id>/reviews", ReviewViewSet.as_view({'post': 'perform_create'}), name='product_review'),
     path("catalog", CatalogViewSet.as_view({'get': 'list'}), name='product_list'),
     path("sales", SalesViewSet.as_view({'get': 'list'}), name='sales_list'),
+    # path("categories", CategoryViewSet.as_view({'get': 'list'}), name='categories_list'),
 ]

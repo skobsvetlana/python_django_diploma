@@ -1,4 +1,4 @@
-import json
+from collections import OrderedDict
 
 from catalog.models import (Product,
                             Tag,
@@ -206,9 +206,19 @@ class CategorySerializer(serializers.ModelSerializer):
     #     if category.category_id == 0:
     #         return super().to_representation(instance)
 
-    # def to_representation(self, value):
-    #     duration = time.strftime('%M:%S', time.gmtime(value.duration))
+    # def to_representation(self, instance):
+    #     items = OrderedDict((
+    #         ('items', data),
+    #         ('currentPage', self.page.number),
+    #         ('lastPage', self.page.paginator.num_pages),
+    #     ))
     #     return 'Track %d: %s (%s)' % (value.order, value.name, duration)
+
+
+    # def to_representation(self, instance):
+    #     data = CategorySerializer(instance).data
+    #     print(data)
+    #     return data
 
     def get_image(self, category: Category):
         print(category.src)

@@ -9,3 +9,8 @@ from catalog.models import Category
 class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+    def list(self, request, *args, **kwargs):
+        items = self.get_serializer(self.queryset, many=True).data
+
+        return Response(items)

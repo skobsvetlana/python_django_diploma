@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 
     'catalog.apps.CatalogConfig',
     'cart.apps.CartConfig',
+    'profiles.apps.ProfilesConfig',
     #'order.apps.OrderConfig',
 
 
@@ -137,4 +138,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #     'PAGE_SIZE': 100
 # }
 
-#APPEND_SLASH = False
+# APPEND_SLASH = True
