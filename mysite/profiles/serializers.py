@@ -8,6 +8,7 @@ from rest_framework import serializers
 class ProfileSerializer(serializers.Serializer):
     fullName =serializers.SerializerMethodField(method_name="get_fullName")
     email = serializers.EmailField(source='user.email', required=True)
+
     class Meta:
         model = Profile
         fields = [
