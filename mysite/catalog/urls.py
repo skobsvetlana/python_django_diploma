@@ -26,9 +26,14 @@ routers.register("banners", BannersViewSet)
 urlpatterns = [
     path("", include(routers.urls)),
     path("product/<int:id>", ProductDetailViewSet.as_view({'get': 'retrieve'}), name='product_detail'),
-    path("product/<int:id>/", ProductDetailViewSet.as_view({'get': 'retrieve'}), name='product_detail'),
+    path("product/<int:id>/", ProductDetailViewSet.as_view({'get': 'retrieve'}), name='_product_detail'),
     path("product/<int:id>/reviews", ReviewViewSet.as_view({'post': 'perform_create'}), name='product_review'),
+    path("products/popular", ProductPopularViewSet.as_view({'get': 'list'}), name='product_popular'),
+    path("products/limited", ProductLimitedViewSet.as_view({'get': 'list'}), name='product_limited'),
+    path("banners", BannersViewSet.as_view({'get': 'list'}), name='banners'),
     path("catalog", CatalogViewSet.as_view({'get': 'list'}), name='product_list'),
     path("sales", SalesViewSet.as_view({'get': 'list'}), name='sales_list'),
-    # path("categories", CategoryViewSet.as_view({'get': 'list'}), name='categories_list'),
+    path("categories", CategoryViewSet.as_view({'get': 'list'}), name='categories_list'),
+    # path("categories/", CategoryViewSet.as_view({'get': 'list'}), name='_categories_list'),
+    path("tags", TagViewSet.as_view({'get': 'list'}), name='tags_list'),
 ]

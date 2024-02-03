@@ -139,7 +139,7 @@ class SaleItemSerializer(serializers.ModelSerializer):
 
 
 class CatalogItemSerializer(serializers.ModelSerializer):
-    images = ImagesSerializer(many=True, required=False)
+    images = ImagesSerializer(many=True, required=True)
     tags = TagSerializer(many=True, required=False)
     count = serializers.SerializerMethodField(method_name="get_count")
     price = serializers.SerializerMethodField(method_name="get_price")
@@ -180,16 +180,7 @@ class CatalogItemSerializer(serializers.ModelSerializer):
         return product.reviews_count
 
 
-class CatalogSerializer(serializers.ModelSerializer):
-    items = CatalogItemSerializer(many=True, required=False)
-
-    class Meta:
-        model = Product
-        fields = ["items"]
-
-
 class CategorySerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField(method_name="get_image")
     subcategory = serializers.SerializerMethodField(method_name="get_subcategory")
 
     class Meta:
@@ -197,32 +188,13 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "title",
-            "subcategory",
             "image",
+            "subcategory",
         ]
 
-    # def to_representation(self, instance):
-    #     category = Category.objects.get(instance)
-    #     if category.category_id == 0:
-    #         return super().to_representation(instance)
-
-    # def to_representation(self, instance):
-    #     items = OrderedDict((
-    #         ('items', data),
-    #         ('currentPage', self.page.number),
-    #         ('lastPage', self.page.paginator.num_pages),
-    #     ))
-    #     return 'Track %d: %s (%s)' % (value.order, value.name, duration)
-
-
-    # def to_representation(self, instance):
-    #     data = CategorySerializer(instance).data
-    #     print(data)
-    #     return data
-
-    def get_image(self, category: Category):
-        print(category.src)
-        return {"src": f"http://127.0.0.1.0:8000/{str(category.src)}", "alt": category.alt}
+    # def get_image(self, category: Category):
+    #     print(category.src)
+    #     return {"src": f"http://127.0.0.1.0:8000/{str(category.src)}", "alt": category.alt}
 
     def get_subcategory(self, category: Category):
         return []

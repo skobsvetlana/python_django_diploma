@@ -10,7 +10,7 @@ def product_images_directory_path(instance: "Images", filename: str) -> str:
         filename=filename
     )
 
-def category_directory_path(instance: "Category", filename: str) -> str:
+def category_image_directory_path(instance: "Category", filename: str) -> str:
     return "images/categories/category_{pk}/{filename}".format(
         pk=instance.pk,
         filename=filename
@@ -22,9 +22,15 @@ class Category(models.Model):
         verbose_name_plural = "Categories"
 
     title = models.CharField(max_length=150, null=False)
-    src = models.ImageField(default="pics/daisy.jpeg", upload_to=category_directory_path)
+    src = models.ImageField(default="pics/daisy.jpeg", upload_to=category_image_directory_path)
     alt = models.CharField(max_length=200, null=False, blank=True)
     category_id = models.PositiveIntegerField(default=0)
+
+    @property
+    def image(self):
+        return {'src': self.src,
+                'alt': self.alt,
+                }
 
     def __str__(self):
         return f'{self.title}'

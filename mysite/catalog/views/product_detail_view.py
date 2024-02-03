@@ -1,6 +1,3 @@
-from collections import OrderedDict
-
-from rest_framework import pagination, status
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.viewsets import ModelViewSet
@@ -18,7 +15,7 @@ class ProductDetailViewSet(ModelViewSet):
     )
     serializer_class = ProductFullSerializer
 
-    def retrieve(self, request, id, **kwargs):
+    def retrieve(self, request: Request, id, **kwargs) -> Response:
         item = get_object_or_404(self.queryset, pk=id)
         serializer = self.get_serializer(item)
         print("++++++++++++++++++++++++productfull_retrieve")
