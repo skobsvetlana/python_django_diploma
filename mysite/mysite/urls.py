@@ -28,6 +28,7 @@ urlpatterns = [
     path('api/', include("profiles.urls")),
     path('api/', include("order.urls")),
     path('api/', include("payment.urls")),
+    path('api/', include("my_auth.urls")),
 ]
 
 if settings.DEBUG:

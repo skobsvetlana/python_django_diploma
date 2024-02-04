@@ -1,11 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User
+from rest_framework import serializers
+
 
 def profile_avatar_directory_path(instance: "Profile", filename: str) -> str:
     return "images/profiles/user_{pk}/avatar/{filename}".format(
         pk=instance.user.pk,
         filename=filename
     )
+
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -19,17 +22,12 @@ class Profile(models.Model):
     )
     alt = models.CharField(max_length=200, null=False, blank=True)
 
-    # class Meta:
-    #     permissions = (("change_avatar", "can change avatar of profile"),)
+    @property
+    def avatar(self):
+        return {
+            "src": serializers.ImageField().to_representation(self.src),
+            "alt": self.alt
+        }
 
     def __str__(self):
         return self.user.username
-
-    @property
-    def avatar(self):
-        return {'src': self.src,
-                'alt': self.alt,
-                }
-
-
-

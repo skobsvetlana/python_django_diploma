@@ -1,3 +1,4 @@
+from rest_framework import serializers
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
@@ -10,11 +11,13 @@ def product_images_directory_path(instance: "Images", filename: str) -> str:
         filename=filename
     )
 
+
 def category_image_directory_path(instance: "Category", filename: str) -> str:
     return "images/categories/category_{pk}/{filename}".format(
         pk=instance.pk,
         filename=filename
     )
+
 
 class Category(models.Model):
     class Meta:
@@ -28,7 +31,7 @@ class Category(models.Model):
 
     @property
     def image(self):
-        return {'src': self.src,
+        return {'src': serializers.ImageField().to_representation(self.src),
                 'alt': self.alt,
                 }
 
@@ -114,18 +117,3 @@ class SaleItem(models.Model):
     salePrice = models.DecimalField(null=False, max_digits=10, decimal_places=2)
     dateFrom = models.DateTimeField(default=now)
     dateTo = models.DateTimeField(null=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
