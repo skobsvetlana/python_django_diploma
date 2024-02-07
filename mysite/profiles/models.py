@@ -12,15 +12,15 @@ def profile_avatar_directory_path(instance: "Profile", filename: str) -> str:
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone = models.CharField(max_length=15, blank=True)
+    phone = models.CharField(max_length=15, blank=True, null=True)
     src = models.ImageField(
-        default="pics/daisy.jpeg",
+        default="pics/avatar.jpg",
         upload_to=profile_avatar_directory_path,
         null=True,
         blank=True,
         verbose_name='avatar'
     )
-    alt = models.CharField(max_length=200, null=False, blank=True)
+    alt = models.CharField(max_length=200, null=True, blank=True)
 
     @property
     def avatar(self):

@@ -1,6 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.viewsets import ModelViewSet
+from rest_framework import status
 
 from cart.models import Product, Cart, CartItem
 
@@ -41,7 +42,7 @@ class CartItemViewSet(ModelViewSet):
         cart_items = CartItem.objects.filter(cart=cart)
         serializer = self.get_serializer(cart_items, many=True)
 
-        return Response(serializer.data, )
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def list(self, request: Request, *args, **kwargs) -> Response:
         serializer = self.get_serializer(self.get_queryset(), many=True)
@@ -69,5 +70,5 @@ class CartItemViewSet(ModelViewSet):
         cart_items = CartItem.objects.filter(cart=cart)
         serializer = self.get_serializer(cart_items, many=True)
 
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
