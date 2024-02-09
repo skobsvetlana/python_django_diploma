@@ -29,6 +29,7 @@ class LoginViewSet(viewsets.GenericViewSet):
                 data={"detail": "Login successful."},
                 status=status.HTTP_200_OK
             )
+
         else:
             return Response(
                 data={"detail": "Invalid login credentials."},
@@ -52,7 +53,7 @@ class LogoutViewSet(viewsets.GenericViewSet):
 
 class UserRegistrationViewSet(viewsets.GenericViewSet):
     """
-    Создает нового пользователя, аутетифицирует и логинит его.
+    Creates a new user, authenticates and logs him in.
     """
 
     serializer_class = UserRegistrationSerializer

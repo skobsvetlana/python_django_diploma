@@ -13,6 +13,6 @@ routers.register("profile", UserProfileViewset, basename="profile")
 urlpatterns = [
     path("", include(routers.urls)),
     path("profile", UserProfileViewset.as_view({'get': 'retrieve',
-                                                'post': 'update'
+                                                'post': 'update',
                                                  })),
 ]

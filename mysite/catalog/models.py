@@ -6,14 +6,14 @@ from django.utils.timezone import now
 
 
 def product_images_directory_path(instance: "Images", filename: str) -> str:
-    return "images/products/product_{pk}/{filename}".format(
+    return "products/product_{pk}/{filename}".format(
         pk=instance.product.pk,
         filename=filename
     )
 
 
 def category_image_directory_path(instance: "Category", filename: str) -> str:
-    return "images/categories/category_{pk}/{filename}".format(
+    return "categories/category_{pk}/{filename}".format(
         pk=instance.pk,
         filename=filename
     )

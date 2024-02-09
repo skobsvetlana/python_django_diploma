@@ -163,7 +163,7 @@ cython_debug/
 /mysite/test.py
 /mysite/db_test.sqlite3
 /NONEED
-/pics
+/mysite/uploads/pics
 /desc
 Интернет-магазин ТЗ.pdf
 .DS_Store

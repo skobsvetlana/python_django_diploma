@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 
 def profile_avatar_directory_path(instance: "Profile", filename: str) -> str:
-    return "images/profiles/user_{pk}/avatar/{filename}".format(
+    return "profiles/user_{pk}/avatar/{filename}".format(
         pk=instance.user.pk,
         filename=filename
     )
@@ -20,7 +20,7 @@ class Profile(models.Model):
         blank=True,
         verbose_name='avatar'
     )
-    alt = models.CharField(max_length=200, null=True, blank=True)
+    alt = models.CharField(max_length=200, null=True, blank=True, default="")
 
     @property
     def avatar(self):
