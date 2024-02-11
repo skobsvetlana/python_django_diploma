@@ -3,23 +3,20 @@ from catalog.serializers import CatalogItemSerializer
 
 from rest_framework import serializers
 
-from cart.models import (Cart,
-                     CartItem,
-                     )
+from cart.models import (
+    Cart,
+    CartItem,
+    )
 
 class CartItemSerializer(serializers.ModelSerializer):
     """
-    Сериализатор для представления корзины и продуктов в ней
+    Сериализатор для представления продукта в корзине
     """
-
-    #product = ProductFullSerializer(many=False)
-    #id = serializers.SerializerMethodField(method_name="product_id")
     #sub_total = serializers.SerializerMethodField(method_name="total")
 
     class Meta:
         model = CartItem
         fields = [
-            #"id",
             "product",
             "count",
             #"sub_total",
@@ -27,9 +24,7 @@ class CartItemSerializer(serializers.ModelSerializer):
 
     # def total(self, cart_item: CartItem):
     #     return cart_item.count * cart_item.product.price
-    #
-    # def product_id(self, cart_item: CartItem):
-    #     return cart_item.product.pk
+
 
     def to_representation(self, instance):
         data = CatalogItemSerializer(instance.product).data
@@ -38,14 +33,23 @@ class CartItemSerializer(serializers.ModelSerializer):
 
 
 class CartSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для представления корзины и продуктов в ней
+    """
     #id = serializers.UUIDField(read_only=True)
     items = CartItemSerializer(many=True, read_only=True)
     grand_total = serializers.SerializerMethodField(method_name="main_total")
 
     class Meta:
         model = Cart
-        fields = ["id", "user", "createdAt", "grand_total", "items"]
-        #fields = ["pk", "createdAt", "items"]
+        fields = [
+            "id",
+            "user",
+            "createdAt",
+            "grand_total",
+            "items"
+        ]
+
 
     def main_total(self, cart: Cart):
         items = cart.items.all()
