@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from catalog.serializers import ProductShortSerializer
+from catalog.serializers import CatalogItemSerializer
 
 from rest_framework import serializers
 
@@ -32,7 +32,7 @@ class CartItemSerializer(serializers.ModelSerializer):
     #     return cart_item.product.pk
 
     def to_representation(self, instance):
-        data = ProductShortSerializer(instance.product).data
+        data = CatalogItemSerializer(instance.product).data
         data['count'] = instance.count
         return data
 
@@ -44,7 +44,7 @@ class CartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cart
-        fields = ["id", "user","createdAt", "grand_total", "items"]
+        fields = ["id", "user", "createdAt", "grand_total", "items"]
         #fields = ["pk", "createdAt", "items"]
 
     def main_total(self, cart: Cart):

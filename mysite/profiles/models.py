@@ -14,7 +14,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=15, blank=True, null=True)
     src = models.ImageField(
-        default="pics/avatar.jpg",
+        # default="pics/avatar.jpg",
         upload_to=profile_avatar_directory_path,
         null=True,
         blank=True,
@@ -24,10 +24,12 @@ class Profile(models.Model):
 
     @property
     def avatar(self):
-        return {
-            "src": serializers.ImageField().to_representation(self.src),
-            "alt": self.alt
-        }
+        if self.src:
+            return {
+                "src": serializers.ImageField().to_representation(self.src),
+                "alt": self.alt
+            }
+        return None
 
     def __str__(self):
         return self.user.username

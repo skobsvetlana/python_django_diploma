@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from profiles.serializers import (
     ProfileSerializer,
+    AvatarUpdateSerializer,
 )
 from profiles.models import Profile
 
@@ -69,10 +70,35 @@ class UserProfileViewset(ModelViewSet):
         )
 
 
+class AvatarUpdateViewset(ModelViewSet):
+    queryset = Profile.objects.all()
+    serializer_class = AvatarUpdateSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user.profile
+
+    def update(self, request: Request, *args, **kwargs) -> Response:
+        data = request.FILES
+        print("avatar data", data)
+        instance = self.get_object()
+        serializer = self.get_serializer(
+            instance=instance,
+            data=data,
+        )
+        serializer.is_valid(raise_exception=True)
+        print("update avatar ", serializer.validated_data)
+        serializer.save()
+
+        return Response(
+            data=serializer.data,
+            status=status.HTTP_201_CREATED,
+        )
 
 
 
-    # def update(self, request: Request, *args, **kwargs) -> Response:
+
+# def update(self, request: Request, *args, **kwargs) -> Response:
     #     avatar = request.data["avatar"]
     #     email = request.data["email"]
     #     phone = request.data["phone"]

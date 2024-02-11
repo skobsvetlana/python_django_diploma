@@ -5,15 +5,15 @@ from rest_framework import status
 
 from cart.models import Product, Cart, CartItem
 
-from cart.serializers import (CartItemSerializer,
-                                CartSerializer,
-                                )
+from cart.serializers import (
+    CartItemSerializer,
+    CartSerializer,
+    )
+
 
 class CartViewSet(ModelViewSet):
     serializer_class = CartSerializer
     queryset = Cart.objects.all()
-    print("||||||||||||||||||")
-    print(queryset)
 
 
 class CartItemViewSet(ModelViewSet):
@@ -21,7 +21,6 @@ class CartItemViewSet(ModelViewSet):
 
     def get_queryset(self, *args, **kwargs):
         queryset = CartItem.objects.filter(cart__user=self.request.user).prefetch_related()
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>get_queryset")
         return queryset
 
     def update(self, request: Request, *args, **kwargs) -> Response:
@@ -36,18 +35,16 @@ class CartItemViewSet(ModelViewSet):
 
         cart_item.save()
 
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!update")
-        print(product_id, count)
-
         cart_items = CartItem.objects.filter(cart=cart)
         serializer = self.get_serializer(cart_items, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
     def list(self, request: Request, *args, **kwargs) -> Response:
         serializer = self.get_serializer(self.get_queryset(), many=True)
-        print("!!!!!!!!!!!!!!!!!!!!!!!cart_list")
         return Response(serializer.data)
+
 
     def destroy(self, request: Request, *args, **kwargs):
         product_id = request.data["id"]
@@ -63,9 +60,6 @@ class CartItemViewSet(ModelViewSet):
             cart_item.save()
         else:
             cart_item.delete()
-
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!delete")
-        print(product_id, count)
 
         cart_items = CartItem.objects.filter(cart=cart)
         serializer = self.get_serializer(cart_items, many=True)

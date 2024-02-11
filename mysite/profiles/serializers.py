@@ -14,7 +14,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         validators=[UniqueValidator(queryset=User.objects.all())]
     )
     phone = serializers.CharField(required=True)
-    avatar = serializers.DictField(required=True)
+    avatar = serializers.DictField(required=False)
 
     class Meta:
         model = Profile
@@ -65,10 +65,33 @@ class ProfileSerializer(serializers.ModelSerializer):
         print("++++++++++++++profile update")
         print("validated_data", validated_data)
         instance.user.first_name = validated_data.get('fullName', instance.user.first_name)
-        instance.src = validated_data['avatar']['src']
-        instance.user.email = validated_data.get('email', instance.user.email)
+        print(validated_data['user']['email'])
+        instance.user.email = validated_data['user']['email']
         instance.phone = validated_data.get('phone', instance.phone)
+        print("update profile instance", instance)
+        instance.user.save()
         instance.save()
         return instance
+
+
+class AvatarUpdateSerializer(serializers.ModelSerializer):
+    avatar = serializers.ImageField(source="src")
+
+    class Meta:
+        model = Profile
+        fields = [
+            "avatar",
+        ]
+
+    def update(self, instance, validated_data):
+        """
+        Update and return an existing `Profile` instance, given the validated data.
+        """
+        print("++++++++++++++profile avatar update")
+        print("validated_data", validated_data)
+        instance.src = validated_data.get('src', instance.src)
+        instance.save()
+        return instance
+
 
 

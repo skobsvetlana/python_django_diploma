@@ -65,7 +65,8 @@ createApp({
 		getBasket() {
 			this.getData('/api/basket')
 				.then((data) => {
-					const basket = {}
+                        console.log(data)
+                        const basket = {}
 					data.forEach((item) => {
 						basket[item.id] = {
 							...item,

@@ -1,6 +1,6 @@
 from django.urls import path, include
 
-from profiles.views import UserProfileViewset
+from profiles.views import UserProfileViewset, AvatarUpdateViewset
 
 from rest_framework.routers import DefaultRouter
 
@@ -15,4 +15,5 @@ urlpatterns = [
     path("profile", UserProfileViewset.as_view({'get': 'retrieve',
                                                 'post': 'update',
                                                  })),
+    path("profile/avatar", AvatarUpdateViewset.as_view({'post': 'update'})),
 ]
