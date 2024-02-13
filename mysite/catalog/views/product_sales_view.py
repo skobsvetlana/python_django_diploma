@@ -6,7 +6,6 @@ from rest_framework.request import Request
 from rest_framework.viewsets import ModelViewSet
 
 from catalog.serializers import SaleItemSerializer
-
 from catalog.models import SaleItem
 
 class SaleItemPagination(pagination.PageNumberPagination):
@@ -38,9 +37,3 @@ class SalesViewSet(ModelViewSet):
                 return self.get_paginated_response(data)
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    # def list(self, request: Request, *args, **kwargs) -> Response:
-    #     items = self.get_serializer(self.queryset, many=True).data
-    #     print("++++++++++++++++++++++++sale_item_list")
-    #     print("sale", len(items))
-    #
-    #     return Response(items)

@@ -1,8 +1,5 @@
 from django.contrib import admin
-from  django.db.models import QuerySet
-from django.http import HttpRequest
-from django.contrib.auth.models import User
-from cart.models import (Product,
+from cart.models import (
                      Cart,
                      CartItem,
                      )

@@ -1,9 +1,9 @@
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.response import Response
+from rest_framework.request import Request
 
 from catalog.serializers import CatalogItemSerializer
 from catalog.models import Product
-from rest_framework.response import Response
-from rest_framework.request import Request
 
 class ProductPopularViewSet(ModelViewSet):
     queryset = (

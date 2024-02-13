@@ -3,6 +3,7 @@ from catalog.serializers import CatalogItemSerializer
 
 from rest_framework import serializers
 
+from catalog.models import SaleItem
 from cart.models import (
     Cart,
     CartItem,
@@ -29,6 +30,11 @@ class CartItemSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = CatalogItemSerializer(instance.product).data
         data['count'] = instance.count
+        sale_item = SaleItem.objects.filter(product=instance.product).first()
+
+        if sale_item:
+            data['price'] = sale_item.salePrice
+
         return data
 
 
@@ -56,3 +62,16 @@ class CartSerializer(serializers.ModelSerializer):
         total = sum([item.count * item.product.price for item in items])
         return total
 
+
+class CartItemForSessionSerializer(serializers.Serializer):
+    product_id = serializers.IntegerField()
+    quantity = serializers.IntegerField()
+    price = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+    def validate(self, attrs):
+        # Проверьте, существует ли продукт с данным ID
+        try:
+            data = CatalogItemSerializer(instance.product).data
+        except Product.DoesNotExist:
+            raise serializers.ValidationError("Продукт с данным ID не найден.")
+        return attrs

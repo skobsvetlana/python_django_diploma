@@ -56,14 +56,17 @@ class CatalogViewSet(ModelViewSet):
         print("freeDelivery=", freeDelivery)
         return queryset
 
+
     def list(self, request: Request, *args, **kwargs) -> Response:
         queryset = self.get_queryset()
-        # page = request.GET.get('page')
+
         if queryset.exists():
             page = self.paginate_queryset(queryset)
+
             if page:
                 data = self.get_serializer(page, many=True).data
                 print("++++++++++++++++++++++++catalog_item_list")
                 print(len(data))
                 return self.get_paginated_response(data)
+
         return Response(status=status.HTTP_404_NOT_FOUND)

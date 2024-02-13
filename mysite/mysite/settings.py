@@ -145,3 +145,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # }
 
 # APPEND_SLASH = True
+
+CART_SESSION_ID = 'cart'

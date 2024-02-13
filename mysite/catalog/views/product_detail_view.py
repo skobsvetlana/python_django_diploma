@@ -18,5 +18,5 @@ class ProductDetailViewSet(ModelViewSet):
     def retrieve(self, request: Request, id, **kwargs) -> Response:
         item = get_object_or_404(self.queryset, pk=id)
         serializer = self.get_serializer(item)
-        print("++++++++++++++++++++++++productfull_retrieve")
+
         return Response(serializer.data)

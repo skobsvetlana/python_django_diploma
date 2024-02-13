@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 from catalog.models import (Product,
                             Tag,
                             Category,

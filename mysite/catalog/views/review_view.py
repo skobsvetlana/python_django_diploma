@@ -5,7 +5,6 @@ from rest_framework.request import Request
 from rest_framework.viewsets import ModelViewSet
 
 from catalog.serializers import ReviewsSerializer
-
 from catalog.models import Review
 
 class ReviewViewSet(ModelViewSet):

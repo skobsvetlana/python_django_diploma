@@ -71,6 +71,12 @@ class ProductAdmin(admin.ModelAdmin):
     classes = ["collapse"]
 
 
+@admin.register(SaleItem)
+class SaleItemAdmin(admin.ModelAdmin):
+    list_display = "id", "product", "salePrice", "dateFrom", "dateTo",
+    list_display_links = "id", "product",
+
+
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = "pk", "title", "category_id", "src", "alt"
