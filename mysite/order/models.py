@@ -11,6 +11,7 @@ class Order(models.Model):
         verbose_name_plural = 'Orders'
 
     createdAt = models.DateTimeField(auto_now_add=True)
+    customer = models.ForeignKey(User, on_delete=models.PROTECT, null=True, default=None)
 
     def __str__(self):
         return self.pk
@@ -20,6 +21,7 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='order_item')
     count = models.PositiveIntegerField(null=False)
     price = models.DecimalField(null=False, max_digits=10, decimal_places=2)
@@ -65,7 +67,7 @@ class Address(models.Model):
         return f"{self.address1}, unit {self.address2}, {self.city}, {self.zip_code}"
 
 
-class OrderDetails(models.Model):
+class OrderInfo(models.Model):
     class Status(models.TextChoices):
         CREATED = 'created',
         PAID = 'paid',
@@ -76,8 +78,6 @@ class OrderDetails(models.Model):
         CARD = 'card',
         RANDOM_ACCOUNT = 'random account',
 
-
-    customer = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
     paymentType = models.CharField(
         max_length=20,
         choices=PaymentType.choices,

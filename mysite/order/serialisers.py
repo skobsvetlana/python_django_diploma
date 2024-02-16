@@ -24,45 +24,48 @@ class AddressSerializer(serializers.ModelSerializer):
             "city",
         ]
 
+
 class OrderItemSerializer(serializers.ModelSerializer):
     """
     Сериализатор для представления продукта в заказе
     """
-    product = CatalogItemSerializer(required=True)
-    #sub_total = serializers.SerializerMethodField(method_name="total")
-
     class Meta:
         model = OrderItem
         fields = [
             "product",
-            #"sub_total",
+            "count",
+            "price",
         ]
-
-    # def total(self, cart_item: CartItem):
-    #     return cart_item.count * cart_item.product.price
 
 
 class OrderSerializer(serializers.ModelSerializer):
     """
     Сериализатор для представления заказа и родуктов в нем.
     """
-    items = OrderItemSerializer(many=True,)
+    #items = OrderItemSerializer(many=True)
+    orderId = serializers.IntegerField(source="pk", read_only=True)
 
     class Meta:
         model = Order
         fields = [
-            "id",
-            "createdAt",
-            "items",
+            "customer",
+            "orderId",
+            #"items",
         ]
 
+    def create(self, validated_data):
+        order_items = validated_data.pop("items", [])
+        order = Order.objects.create(**validated_data)
+        for item in order_items:
+            OrderItem.objects.create(order=order, **item)
+        return order
 
-class OrderDetailsSerializer(serializers.ModelSerializer):
+
+class OrderInfoSerializer(serializers.ModelSerializer):
     """
     Сериализатор для полного представления заказа, включая адреса доставки, статуса и прочее,
     а также родуктов в нем.
     """
-    #id = serializers.UUIDField(read_only=True)
     address = AddressSerializer(required=True)
     items = OrderItemSerializer(many=True,)
     grand_total = serializers.SerializerMethodField(method_name="main_total")

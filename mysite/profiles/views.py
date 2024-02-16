@@ -56,7 +56,6 @@ class UserProfileViewset(ModelViewSet):
             partial=True
         )
         serializer.is_valid(raise_exception=True)
-        print(serializer.validated_data)
         serializer.save()
 
         return Response(

@@ -60,7 +60,7 @@ class CartItemViewSet(ModelViewSet):
         else:
             # session_key = request.session.session_key
             # session_key = request.get_or_create_session_key()
-            cart_items = request.session.get('cart', [])
+            cart_items = request.session.get('cart_data', [])
             index = find_index_by_key(cart_items, "id", product.pk)
             sale_item = SaleItem.objects.filter(product=product).first()
 
@@ -74,7 +74,7 @@ class CartItemViewSet(ModelViewSet):
             product.totalCount = count
             item = CatalogItemSerializer(product).data
             cart_items.append(item)
-            request.session["cart"] = cart_items
+            request.session["cart_data"] = cart_items
 
         return Response(cart_items, status=status.HTTP_200_OK)
 
@@ -84,7 +84,7 @@ class CartItemViewSet(ModelViewSet):
         if request.user.is_authenticated:
             serializer = self.get_serializer(self.get_queryset(), many=True)
         else:
-            cart_items = request.session.get('cart', [])
+            cart_items = request.session.get('cart_data', [])
             product_ids = [item.get('id') for item in cart_items]
             products = Product.objects.filter(pk__in=product_ids)
             serializer = CatalogItemSerializer(products, many=True)
@@ -95,20 +95,34 @@ class CartItemViewSet(ModelViewSet):
     def destroy(self, request: Request, *args, **kwargs):
         product_id = request.data["id"]
         count = request.data["count"]
-
-        cart, created = Cart.objects.get_or_create(user=request.user)
         product = Product.objects.get(id=product_id)
 
-        cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+        if request.user.is_authenticated:
+            cart, created = Cart.objects.get_or_create(user=request.user)
+            cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
 
-        if cart_item.count > count:
-            cart_item.count -= count
-            cart_item.save()
+            if cart_item.count > count:
+                cart_item.count -= count
+                cart_item.save()
+            else:
+                cart_item.delete()
+
+            cart_items = CartItem.objects.filter(cart=cart)
+            serializer = self.get_serializer(cart_items, many=True)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            cart_item.delete()
+            cart_items = request.session.get('cart_data', [])
+            index = find_index_by_key(cart_items, "id", product.pk)
+            item = cart_items.pop(index)
 
-        cart_items = CartItem.objects.filter(cart=cart)
-        serializer = self.get_serializer(cart_items, many=True)
+            if item["count"] > count:
+                count = item["count"] - count
+                product.totalCount = count
+                item = CatalogItemSerializer(product).data
+                cart_items.append(item)
+                request.session["cart_data"] = cart_items
+                request.session.modified = True
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(cart_items, status=status.HTTP_200_OK)
 
