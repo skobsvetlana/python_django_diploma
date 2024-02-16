@@ -79,7 +79,7 @@ class SaleItemAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = "pk", "title", "category_id", "src", "alt"
+    list_display = "pk", "title", "parent", "src", "alt"
     list_display_links = "pk", "title"
 
 

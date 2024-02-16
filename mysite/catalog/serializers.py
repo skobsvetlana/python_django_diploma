@@ -179,9 +179,19 @@ class CatalogItemSerializer(serializers.ModelSerializer):
         return product.reviews_count
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    subcategory = serializers.SerializerMethodField(method_name="get_subcategory")
+class SubCategorySerializer(serializers.ModelSerializer):
+    #parent = serializers.RelatedField(read_only=True)
 
+    class Meta:
+        model = Category
+        fields = [
+            "id",
+            "title",
+            "image",
+        ]
+
+class CategorySerializer(serializers.ModelSerializer):
+    subcategory = SubCategorySerializer(many=True)
     class Meta:
         model = Category
         fields = [
@@ -191,9 +201,13 @@ class CategorySerializer(serializers.ModelSerializer):
             "subcategory",
         ]
 
-    # def get_image(self, category: Category):
-    #     print(category.src)
-    #     return {"src": f"http://127.0.0.1.0:8000/{str(category.src)}", "alt": category.alt}
+        # def get_fields(self):
+        #     fields = super(CategorySerializer, self).get_fields()
+        #     fields['subcategory'] = CategorySerializer(many=True)
+        #     return fields
 
-    def get_subcategory(self, category: Category):
-        return []
+
+
+
+    # def get_subcategory(self, category: Category):
+    #     return []

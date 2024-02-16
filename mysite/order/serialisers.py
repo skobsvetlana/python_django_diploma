@@ -42,7 +42,6 @@ class OrderSerializer(serializers.ModelSerializer):
     """
     Сериализатор для представления заказа и родуктов в нем.
     """
-    #items = OrderItemSerializer(many=True)
     orderId = serializers.IntegerField(source="pk", read_only=True)
 
     class Meta:
@@ -50,7 +49,6 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = [
             "customer",
             "orderId",
-            #"items",
         ]
 
     def create(self, validated_data):

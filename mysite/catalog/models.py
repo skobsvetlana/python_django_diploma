@@ -27,7 +27,13 @@ class Category(models.Model):
     title = models.CharField(max_length=150, null=False)
     src = models.ImageField(default="pics/daisy.jpeg", upload_to=category_image_directory_path)
     alt = models.CharField(max_length=200, null=False, blank=True)
-    category_id = models.PositiveIntegerField(default=0)
+    parent = models.ForeignKey(
+        "self",
+        models.DO_NOTHING,
+        blank=True,
+        null=True,
+        related_name="subcategory",
+    )
 
     @property
     def image(self):
