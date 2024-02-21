@@ -92,6 +92,15 @@ class ProductFullSerializer(serializers.ModelSerializer):
     def date_to_string(self, product: Product):
         return product.date.strftime("%a %b %d %Y %H:%M:%S GMT%z %Z")
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        sale_item = SaleItem.objects.filter(product=instance.pk).first()
+
+        if sale_item:
+            data['price'] = sale_item.salePrice
+
+        return data
+
 
 class ProductShortSerializer(serializers.ModelSerializer):
     images = ImagesSerializer(many=True, required=False)
@@ -202,7 +211,7 @@ class SubCategorySerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data['parent'] = instance.parent.pk if instance.parent else None
+        data['parent'] = serializers.PrimaryKeyRelatedField()
         return data
 
 
@@ -217,10 +226,6 @@ class CategorySerializer(serializers.ModelSerializer):
             "subcategory",
         ]
 
-        # def get_fields(self):
-        #     fields = super(CategorySerializer, self).get_fields()
-        #     fields['subcategory'] = CategorySerializer(many=True)
-        #     return fields
 
 
 

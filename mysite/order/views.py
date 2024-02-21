@@ -87,7 +87,7 @@ class OrderViewSet(ModelViewSet):
 
 
 class OrderDetailViewSet(ModelViewSet):
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     serializer_class = OrderDetailSerializer
     # filter_backends = [DjangoFilterBackend]
     # filterset_fields = ['customer',]
