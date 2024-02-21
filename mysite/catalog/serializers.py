@@ -178,9 +178,18 @@ class CatalogItemSerializer(serializers.ModelSerializer):
     def get_reviews(self, product: Product):
         return product.reviews_count
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        sale_item = SaleItem.objects.filter(product=instance.pk).first()
+
+        if sale_item:
+            data['price'] = sale_item.salePrice
+
+        return data
+
 
 class SubCategorySerializer(serializers.ModelSerializer):
-    #parent = serializers.RelatedField(read_only=True)
+    parent = serializers.RelatedField(read_only=True)
 
     class Meta:
         model = Category
@@ -188,7 +197,14 @@ class SubCategorySerializer(serializers.ModelSerializer):
             "id",
             "title",
             "image",
+            "parent",
         ]
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['parent'] = instance.parent.pk if instance.parent else None
+        return data
+
 
 class CategorySerializer(serializers.ModelSerializer):
     subcategory = SubCategorySerializer(many=True)
@@ -208,6 +224,3 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 
-
-    # def get_subcategory(self, category: Category):
-    #     return []

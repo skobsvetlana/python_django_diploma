@@ -1,13 +1,11 @@
-from django.contrib.auth.models import User
-from catalog.serializers import CatalogItemSerializer
+from catalog.serializers import CatalogItemSerializer, ImagesSerializer, TagSerializer
 
 from rest_framework import serializers
 
-from catalog.models import SaleItem
 from order.models import (
     Address,
     Order,
-    OrderItem
+    OrderItem,
 )
 
 
@@ -21,7 +19,6 @@ class AddressSerializer(serializers.ModelSerializer):
             "address1",
             "address2",
             "zip_code",
-            "city",
         ]
 
 
@@ -29,6 +26,8 @@ class OrderItemSerializer(serializers.ModelSerializer):
     """
     Сериализатор для представления продукта в заказе
     """
+    # product = CatalogItemSerializer()
+
     class Meta:
         model = OrderItem
         fields = [
@@ -38,51 +37,70 @@ class OrderItemSerializer(serializers.ModelSerializer):
         ]
 
 
+    def to_representation(self, instance):
+        data = CatalogItemSerializer(instance.product).data
+        data['count'] = instance.count
+        data['price'] = instance.price
+
+        return data
+
+
 class OrderSerializer(serializers.ModelSerializer):
     """
     Сериализатор для представления заказа и родуктов в нем.
     """
     orderId = serializers.IntegerField(source="pk", read_only=True)
+    products = OrderItemSerializer(many=True)
 
     class Meta:
         model = Order
         fields = [
-            "customer",
             "orderId",
+            "products",
         ]
 
+
     def create(self, validated_data):
-        order_items = validated_data.pop("items", [])
+        order_items = validated_data.pop("products", [])
         order = Order.objects.create(**validated_data)
+
         for item in order_items:
             OrderItem.objects.create(order=order, **item)
+
         return order
 
 
-class OrderInfoSerializer(serializers.ModelSerializer):
+class OrderDetailSerializer(serializers.ModelSerializer):
     """
     Сериализатор для полного представления заказа, включая адреса доставки, статуса и прочее,
     а также родуктов в нем.
     """
-    address = AddressSerializer(required=True)
-    items = OrderItemSerializer(many=True,)
-    grand_total = serializers.SerializerMethodField(method_name="main_total")
+    address = AddressSerializer()
+    products = OrderItemSerializer(many=True)
 
     class Meta:
         model = Order
         fields = [
             "id",
-            "customer",
             "createdAt",
+            "fullName",
+            "email",
+            "phone",
+            "deliveryType",
             "paymentType",
+            "totalCost",
             "status",
-            "grand_total",
             "address",
-            "items",
+            "products",
         ]
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if representation["address"] is not None:
+            representation['city'] = instance.address.city
+        else:
+            representation['city'] = None
+        return representation
 
-    def main_total(self, order: Order):
-        items = order.items.all()
-        total = sum([item.count * item.product.price for item in items])
-        return total
+
+

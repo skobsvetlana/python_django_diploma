@@ -1,36 +1,9 @@
 from django.db import models
+# from django.db.models import Sum, F
+
 from django.contrib.auth.models import User
 
 from catalog.models import Product
-
-
-class Order(models.Model):
-    class Meta:
-        ordering = ('-createdAt',)
-        verbose_name = 'Order'
-        verbose_name_plural = 'Orders'
-
-    createdAt = models.DateTimeField(auto_now_add=True)
-    customer = models.ForeignKey(User, on_delete=models.PROTECT, null=True, default=None)
-
-    def __str__(self):
-        return self.pk
-
-    # def get_total_cost(self):
-    #     return sum(item.get_cost() for item in self.items.all())
-
-
-class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='order_item')
-    count = models.PositiveIntegerField(null=False)
-    price = models.DecimalField(null=False, max_digits=10, decimal_places=2)
-
-    def __str__(self):
-        return '{}'.format(self.pk)
-
-    # def get_cost(self):
-    #     return self.product.price * self.count
 
 
 class Address(models.Model):
@@ -67,41 +40,81 @@ class Address(models.Model):
         return f"{self.address1}, unit {self.address2}, {self.city}, {self.zip_code}"
 
 
-class OrderInfo(models.Model):
+class Order(models.Model):
     class Status(models.TextChoices):
         CREATED = 'created',
         PAID = 'paid',
         ACCEPTED = 'accepted',
+        COMPLETED = 'completed',
 
 
     class PaymentType(models.TextChoices):
         CARD = 'card',
         RANDOM_ACCOUNT = 'random account',
 
+
+    class DeliveryType(models.TextChoices):
+        FREE = 'free',
+        PAID = 'toll',
+
+
+    class Meta:
+        ordering = ('-createdAt',)
+        verbose_name = 'Order'
+        verbose_name_plural = 'Orders'
+
+    createdAt = models.DateTimeField(auto_now_add=True)
+    customer = models.ForeignKey(User, on_delete=models.PROTECT, null=True, default=None)
+    fullName = models.CharField(max_length=200, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
+    phone = models.CharField(max_length=15, blank=True, null=True)
+    deliveryType = models.CharField(
+        max_length=4,
+        choices=DeliveryType.choices,
+        default=DeliveryType.FREE,
+    )
     paymentType = models.CharField(
         max_length=20,
         choices=PaymentType.choices,
         default=PaymentType.CARD,
     )
-    #totalCost = models.DecimalField(null=False, max_digits=12, decimal_places=2, default=0)
     status =models.CharField(
         max_length=20,
         choices=Status.choices,
         default=Status.CREATED,
     )
     address = models.ForeignKey(Address, on_delete=models.PROTECT, null=True)
-    order = models.OneToOneField(
-        Order,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True
-    )
+
 
     def __str__(self):
         return 'Order №{number} status {status}'.format(
-            number=self.order,
-            status=self.status
+            number=self.pk,
+            status=self.status,
         )
+
+    @property
+    def totalCost(self):
+        total = sum(item.get_cost() for item in self.products.all())
+        return total if total is not None else 0
+
+    # @property
+    # def totalCost(self):
+    #     total = self.products.aggregate(total_cost=Sum(F('price') * F('count')))['total_cost']
+    #     return total if total is not None else 0
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='products')
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='order_item')
+    count = models.PositiveIntegerField(null=False)
+    price = models.DecimalField(null=False, max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return '{}'.format(self.pk)
+
+    def get_cost(self):
+        return self.price * self.count
+
 
 
 

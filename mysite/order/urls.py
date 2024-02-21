@@ -1,19 +1,29 @@
 from django.urls import path, include
 
-from order.views import OrderViewSet
+from order.views import OrderViewSet, OrderDetailViewSet
 
 from rest_framework.routers import DefaultRouter
 
 app_name = "order"
 
 routers = DefaultRouter()
-
-from django.urls import path, include
-
 routers.register("order", OrderViewSet, basename="order")
+routers.register("orders", OrderViewSet, basename="orders")
+
+
 
 urlpatterns = [
-    path("order", include(routers.urls)),
-    path("orders", OrderViewSet.as_view({'post': 'create'})),
-    path("order-detail/<int:id>/", OrderViewSet.as_view({'get': 'retrieve'})),
-    ]
+    path("", include(routers.urls)),
+    path("orders", OrderViewSet.as_view(
+        {
+            'get': 'list',
+            'post': 'create',
+        }
+    )),
+    path("orders/<int:id>/", OrderDetailViewSet.as_view(
+        {
+            'get': 'retrieve',
+            'post': 'update',
+        }
+    )),
+]
