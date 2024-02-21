@@ -7,6 +7,7 @@ from rest_framework import status
 
 from django.shortcuts import get_object_or_404
 
+from cart.models import Cart
 from order.models import Order
 from order.serialisers import (
     OrderSerializer,
@@ -47,7 +48,7 @@ class OrderViewSet(ModelViewSet):
         if request.user.is_authenticated:
             print("request.user.is_authenticated")
             data = request.data
-            #Cart.objects.get(user=request.user).delete()
+            Cart.objects.get(user=request.user).delete()
         else:
             print("request.user.is_not_authenticated")
             data = request.session.get('cart_data', [])
