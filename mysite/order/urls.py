@@ -10,8 +10,6 @@ routers = DefaultRouter()
 routers.register("order", OrderViewSet, basename="order")
 routers.register("orders", OrderViewSet, basename="orders")
 
-
-
 urlpatterns = [
     path("", include(routers.urls)),
     path("orders", OrderViewSet.as_view(
@@ -21,6 +19,12 @@ urlpatterns = [
         }
     )),
     path("orders/<int:id>/", OrderDetailViewSet.as_view(
+        {
+            'get': 'retrieve',
+            'post': 'update',
+        }
+    )),
+    path("orders/<int:id>", OrderDetailViewSet.as_view(
         {
             'get': 'retrieve',
             'post': 'update',

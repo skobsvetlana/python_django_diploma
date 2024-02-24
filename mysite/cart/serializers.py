@@ -3,7 +3,7 @@ from catalog.serializers import CatalogItemSerializer
 
 from rest_framework import serializers
 
-from catalog.models import SaleItem
+from catalog.models import SaleItem, Product
 from cart.models import (
     Cart,
     CartItem,
@@ -68,7 +68,7 @@ class CartItemForSessionSerializer(serializers.Serializer):
     quantity = serializers.IntegerField()
     price = serializers.DecimalField(max_digits=10, decimal_places=2)
 
-    def validate(self, attrs):
+    def validate(self, attrs, instance=None):
         # Проверьте, существует ли продукт с данным ID
         try:
             data = CatalogItemSerializer(instance.product).data

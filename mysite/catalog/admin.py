@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db.models import QuerySet
 from django.http import HttpRequest
-from django.contrib.auth.models import User
+
 from catalog.models import (Product,
                             Category,
                             Tag,
@@ -81,6 +81,11 @@ class SaleItemAdmin(admin.ModelAdmin):
 class CategoryAdmin(admin.ModelAdmin):
     list_display = "pk", "title", "parent", "src", "alt"
     list_display_links = "pk", "title"
+
+    fieldsets = (
+        ('Основная информация', {'fields': ('title', 'parent')}),
+        ('Фотография', {'fields': ('src', 'alt',)})
+    )
 
 
 @admin.register(Tag)

@@ -66,7 +66,7 @@ class CatalogViewSet(ModelViewSet):
             if page:
                 data = self.get_serializer(page, many=True).data
                 print("++++++++++++++++++++++++catalog_item_list")
-                print(len(data))
+                print("len(data)", len(data))
                 return self.get_paginated_response(data)
 
         return Response(status=status.HTTP_404_NOT_FOUND)

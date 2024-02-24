@@ -14,8 +14,6 @@ class LoginViewSet(viewsets.GenericViewSet):
     """
     def create(self, request, *args, **kwargs):
         data = json.loads(next(iter(request.data.keys())))
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!user_login")
-        print(data.get('username'), data.get('password'))
 
         user = authenticate(
             self.request,
@@ -59,15 +57,11 @@ class UserRegistrationViewSet(viewsets.GenericViewSet):
     serializer_class = UserRegistrationSerializer
 
     def create(self, request, *args, **kwargs):
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!user_registration")
         data = json.loads(next(iter(request.data.keys())))
-        print(data)
 
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
-        print(serializer.validated_data)
         user = serializer.save()
-        print('cat', user.username, user.password)
         user = authenticate(
             request,
             username=user.username,

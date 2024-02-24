@@ -1,3 +1,5 @@
+import json
+
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
@@ -8,6 +10,7 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 
 from cart.models import Cart
+from my_auth.serializers import UserRegistrationSerializer
 from order.models import Order
 from order.serialisers import (
     OrderSerializer,
@@ -46,11 +49,9 @@ class OrderViewSet(ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            print("request.user.is_authenticated")
             data = request.data
             Cart.objects.get(user=request.user).delete()
         else:
-            print("request.user.is_not_authenticated")
             data = request.session.get('cart_data', [])
             request.session['cart_data'] = []
 
@@ -59,6 +60,7 @@ class OrderViewSet(ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
+
         return Response(
             data={"orderId": serializer.instance.pk},
             status=status.HTTP_201_CREATED,
@@ -71,11 +73,11 @@ class OrderViewSet(ModelViewSet):
         user = self.request.user
         validated_data = serializer.validated_data
         if self.request.user.is_authenticated:
-            print("request.user.is_authenticated")
             validated_data['customer'] = user
             validated_data['fullName'] = user.first_name
             validated_data['email'] = user.email
             validated_data['phone'] = user.profile.phone
+
         serializer.save()
 
 
@@ -88,9 +90,8 @@ class OrderViewSet(ModelViewSet):
 
 class OrderDetailViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
+    queryset = Order.objects.all()
     serializer_class = OrderDetailSerializer
-    # filter_backends = [DjangoFilterBackend]
-    # filterset_fields = ['customer',]
 
 
     def get_queryset(self):
@@ -101,27 +102,42 @@ class OrderDetailViewSet(ModelViewSet):
         )
         return queryset
 
+
+    # def get_serializer_class(self):
+    #     if self.request.method == 'POST':
+    #         return OrderUpdate1Serializer
+    #     elif self.request.method == 'GET':
+    #         return OrderDetailSerializer
+
+
     def uodate(self, request: Request, *args, **kwargs) -> Response:
-        id = kwargs.get("pk")
-        print(id)
-        return Response()
+        print("++++++++++++++++++++++++order_update")
+        print("request.data", request.data)
+        print("args, kwargs", args, kwargs)
+
+        instance = self.get_object()
+        serializer = self.get_serializer(
+            instance=instance,
+            data=request.data,
+            partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
 
 
     def retrieve(self, request: Request, *args, **kwargs) -> Response:
+        print("+++++++++++++++++++++++++++++retrieve")
         id = kwargs.get("pk")
-        print(args, kwargs)
         item = get_object_or_404(self.queryset, pk=id)
+        if item.customer == None:
+            item.customer = request.user.pk
         serializer = self.get_serializer(item)
-        print("++++++++++++++++++++++++order_retrieve")
-        print(serializer.data)
+        print("serializer.data", serializer.data)
         return Response(serializer.data)
 
 
-    def list(self, request: Request, *args, **kwargs) -> Response:
-        #queryset = self.filter_queryset(self.get_queryset())
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
 
 
 

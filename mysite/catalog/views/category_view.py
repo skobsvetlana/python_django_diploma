@@ -9,7 +9,7 @@ class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
-    def list(self, request: Request, *args, **kwargs) -> Response:
-        items = self.get_serializer(self.queryset, many=True).data
-
-        return Response(items)
+    # def list(self, request: Request, *args, **kwargs) -> Response:
+    #     items = self.get_serializer(self.queryset, many=True).data
+    #
+    #     return Response(items)

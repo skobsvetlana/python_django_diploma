@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'frontend',
     'rest_framework',
     'django_filters',
+    'mptt',
 
     'catalog.apps.CatalogConfig',
     'cart.apps.CartConfig',

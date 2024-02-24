@@ -1,9 +1,10 @@
 from rest_framework import serializers
+from mptt.models import MPTTModel, TreeForeignKey
+
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.utils.timezone import now
-
 
 def product_images_directory_path(instance: "Images", filename: str) -> str:
     return "products/product_{pk}/{filename}".format(
@@ -20,18 +21,18 @@ def category_image_directory_path(instance: "Category", filename: str) -> str:
 
 
 class Category(models.Model):
-    class Meta:
-        verbose_name = "Category"
-        verbose_name_plural = "Categories"
-
+    """
+    Модель категорий с вложенностью
+    """
     title = models.CharField(max_length=150, null=False)
     src = models.ImageField(default="pics/daisy.jpeg", upload_to=category_image_directory_path)
     alt = models.CharField(max_length=200, null=False, blank=True)
     parent = models.ForeignKey(
         "self",
-        models.DO_NOTHING,
+        on_delete=models.CASCADE,
         blank=True,
         null=True,
+        db_index=True,
         related_name="subcategory",
     )
 
@@ -41,8 +42,12 @@ class Category(models.Model):
                 'alt': self.alt,
                 }
 
+    class Meta:
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"
+
     def __str__(self):
-        return f'{self.title}'
+        return self.title
 
 
 class Tag(models.Model):

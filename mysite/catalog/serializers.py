@@ -1,3 +1,5 @@
+from rest_framework_recursive.fields import RecursiveField
+
 from catalog.models import (Product,
                             Tag,
                             Category,
@@ -97,7 +99,7 @@ class ProductFullSerializer(serializers.ModelSerializer):
         sale_item = SaleItem.objects.filter(product=instance.pk).first()
 
         if sale_item:
-            data['price'] = sale_item.salePrice
+            data['price'] = float(sale_item.salePrice)
 
         return data
 
@@ -192,31 +194,16 @@ class CatalogItemSerializer(serializers.ModelSerializer):
         sale_item = SaleItem.objects.filter(product=instance.pk).first()
 
         if sale_item:
-            data['price'] = sale_item.salePrice
+            data['price'] = float(sale_item.salePrice)
 
-        return data
-
-
-class SubCategorySerializer(serializers.ModelSerializer):
-    parent = serializers.RelatedField(read_only=True)
-
-    class Meta:
-        model = Category
-        fields = [
-            "id",
-            "title",
-            "image",
-            "parent",
-        ]
-
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        data['parent'] = serializers.PrimaryKeyRelatedField()
         return data
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    subcategory = SubCategorySerializer(many=True)
+    #subcategory = RecursiveField(many=True)
+    subcategory = serializers.RelatedField(read_only=True)
+
+
     class Meta:
         model = Category
         fields = [
@@ -226,6 +213,8 @@ class CategorySerializer(serializers.ModelSerializer):
             "subcategory",
         ]
 
-
-
-
+    #     def to_representation(self, instance):
+    #         data = super().to_representation(instance)
+    #         parent = Category.objects.filter(parent=instance.parent.pk)
+    #         data['parent'] = parent
+    #         return data
