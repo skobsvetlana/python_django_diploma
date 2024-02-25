@@ -33,7 +33,7 @@ class Category(models.Model):
         blank=True,
         null=True,
         db_index=True,
-        related_name="subcategory",
+        related_name="subcategories",
     )
 
     @property

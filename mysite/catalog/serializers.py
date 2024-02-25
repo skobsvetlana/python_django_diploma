@@ -200,9 +200,7 @@ class CatalogItemSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    #subcategory = RecursiveField(many=True)
-    subcategory = serializers.RelatedField(read_only=True)
-
+    subcategories = RecursiveField(allow_null=True, many=True)
 
     class Meta:
         model = Category
@@ -210,11 +208,6 @@ class CategorySerializer(serializers.ModelSerializer):
             "id",
             "title",
             "image",
-            "subcategory",
+            "subcategories",
         ]
 
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        parent = Category.objects.filter(parent=instance.parent.pk)
-        data['parent'] = parent
-        return data
