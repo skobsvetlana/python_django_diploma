@@ -1,4 +1,5 @@
-import json
+from django.contrib.auth import login
+from django.contrib.auth.models import User
 
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
@@ -38,6 +39,7 @@ class OrderViewSet(ModelViewSet):
         elif self.request.method == 'GET':
             return OrderDetailSerializer
 
+
     def get_queryset(self):
         queryset = (
             Order.objects
@@ -52,9 +54,10 @@ class OrderViewSet(ModelViewSet):
             data = request.data
             Cart.objects.get(user=request.user).delete()
         else:
+            print("maymaymay")
             data = request.session.get('cart_data', [])
             request.session['cart_data'] = []
-
+        print("+++++++++++++++++++++++")
         data = filter_data(data)
         serializer = self.get_serializer(data={"products": data})
         serializer.is_valid(raise_exception=True)
@@ -77,12 +80,11 @@ class OrderViewSet(ModelViewSet):
             validated_data['fullName'] = user.first_name
             validated_data['email'] = user.email
             validated_data['phone'] = user.profile.phone
-
         serializer.save()
 
 
     def list(self, request: Request, *args, **kwargs) -> Response:
-        #queryset = self.filter_queryset(self.get_queryset())
+        # queryset = self.filter_queryset(self.get_queryset())
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
@@ -94,28 +96,12 @@ class OrderDetailViewSet(ModelViewSet):
     serializer_class = OrderDetailSerializer
 
 
-    def get_queryset(self):
-        queryset = (
-            Order.objects
-            .select_related("customer", "address")
-            .filter(customer=self.request.user)
-        )
-        return queryset
-
-
-    # def get_serializer_class(self):
-    #     if self.request.method == 'POST':
-    #         return OrderUpdate1Serializer
-    #     elif self.request.method == 'GET':
-    #         return OrderDetailSerializer
-
-
-    def uodate(self, request: Request, *args, **kwargs) -> Response:
+    def update(self, request: Request, *args, **kwargs) -> Response:
         print("++++++++++++++++++++++++order_update")
-        print("request.data", request.data)
-        print("args, kwargs", args, kwargs)
+        id = kwargs.get("id")
+        instance = get_object_or_404(self.queryset, pk=id)
+        print(instance.address)
 
-        instance = self.get_object()
         serializer = self.get_serializer(
             instance=instance,
             data=request.data,
@@ -123,23 +109,19 @@ class OrderDetailViewSet(ModelViewSet):
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data)
-
+        return Response(serializer.data, )
 
 
     def retrieve(self, request: Request, *args, **kwargs) -> Response:
         print("+++++++++++++++++++++++++++++retrieve")
-        id = kwargs.get("pk")
+        id = kwargs.get("id")
         item = get_object_or_404(self.queryset, pk=id)
         if item.customer == None:
-            item.customer = request.user.pk
+            user = User.objects.filter(pk=request.user.pk).first()
+            item.fullName = user.first_name
+            item.email = user.email
+            item.phone = user.profile.phone
+
         serializer = self.get_serializer(item)
         print("serializer.data", serializer.data)
         return Response(serializer.data)
-
-
-
-
-
-
-

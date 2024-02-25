@@ -1,4 +1,4 @@
-from catalog.serializers import CatalogItemSerializer, ImagesSerializer, TagSerializer
+from catalog.serializers import CatalogItemSerializer
 
 from rest_framework import serializers
 
@@ -75,7 +75,6 @@ class OrderDetailSerializer(serializers.ModelSerializer):
     Сериализатор для полного представления заказа, включая адреса доставки, статуса и прочее,
     а также родуктов в нем.
     """
-    address = AddressSerializer()
     products = OrderItemSerializer(many=True)
 
     class Meta:
@@ -90,56 +89,39 @@ class OrderDetailSerializer(serializers.ModelSerializer):
             "paymentType",
             "totalCost",
             "status",
-            "address",
             "products",
         ]
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        if representation["address"] is not None:
-            representation['city'] = instance.address.city
-        else:
-            representation['city'] = None
+
+        if instance.address is None:
+            address = Address.objects.create(address1="", address2="", city="", zip_code="",)
+            instance.address = address
+
+        representation['city'] = instance.address.city
+        representation['address'] = instance.address.address1
+        instance.save()
+
         return representation
 
     def update(self, instance, validated_data):
         """
-        Изменяет и возвращает данные получателе заказа.
+        Изменяет и возвращает данные получателе заказа, адрес.
         """
-        print(validated_data)
-        instance.fullName = validated_data('fullName', instance.fullName)
-        instance.email = validated_data('email', instance.email)
+        instance.fullName = validated_data.get('fullName', instance.fullName)
+        instance.email = validated_data.get('email', instance.email)
         instance.phone = validated_data.get('phone', instance.phone)
         instance.deliveryType = validated_data.get('deliveryType', instance.deliveryType)
         instance.paymentType = validated_data.get('paymentType', instance.paymentType)
         instance.address.address1 = validated_data.get('address', instance.address.address1)
         instance.address.city = validated_data.get('city', instance.address.city)
-
+        instance.address.save()
         instance.save()
+
         return instance
 
 
-class OrderUpdateSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для представления данных о получателе заказа.
-    """
-    class Meta:
-        model = Order
-        fields = [
-            "fullName",
-            "email",
-            "phone",
-        ]
-
-    def update(self, instance, validated_data):
-        """
-        Изменяет и возвращает данные получателе заказа.
-        """
-        instance.fullName = validated_data('fullName', instance.fullName)
-        instance.email = validated_data('email', instance.email)
-        instance.phone = validated_data.get('phone', instance.phone)
-        instance.save()
-        return instance
 
 
 

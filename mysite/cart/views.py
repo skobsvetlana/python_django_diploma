@@ -80,10 +80,10 @@ class CartItemViewSet(ModelViewSet):
 
 
     def list(self, request: Request, *args, **kwargs) -> Response:
-
         if request.user.is_authenticated:
             serializer = self.get_serializer(self.get_queryset(), many=True)
         else:
+            # здесь totalCount заменить на count
             cart_items = request.session.get('cart_data', [])
             product_ids = [item.get('id') for item in cart_items]
             products = Product.objects.filter(pk__in=product_ids)

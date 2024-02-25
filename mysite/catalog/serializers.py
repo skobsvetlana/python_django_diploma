@@ -213,8 +213,8 @@ class CategorySerializer(serializers.ModelSerializer):
             "subcategory",
         ]
 
-    #     def to_representation(self, instance):
-    #         data = super().to_representation(instance)
-    #         parent = Category.objects.filter(parent=instance.parent.pk)
-    #         data['parent'] = parent
-    #         return data
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        parent = Category.objects.filter(parent=instance.parent.pk)
+        data['parent'] = parent
+        return data

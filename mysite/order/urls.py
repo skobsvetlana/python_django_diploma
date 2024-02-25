@@ -18,13 +18,13 @@ urlpatterns = [
             'post': 'create',
         }
     )),
-    path("orders/<int:id>/", OrderDetailViewSet.as_view(
-        {
-            'get': 'retrieve',
-            'post': 'update',
-        }
-    )),
-    path("orders/<int:id>", OrderDetailViewSet.as_view(
+    # path("orders/<int:id>/", OrderDetailViewSet.as_view(
+    #     {
+    #         'get': 'retrieve',
+    #         'post': 'update',
+    #     }
+    # )),
+    path("order/<int:id>", OrderDetailViewSet.as_view(
         {
             'get': 'retrieve',
             'post': 'update',

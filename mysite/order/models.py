@@ -49,13 +49,13 @@ class Order(models.Model):
 
 
     class PaymentType(models.TextChoices):
-        CARD = 'card',
-        RANDOM_ACCOUNT = 'random account',
+        CARD = 'online',
+        RANDOM_ACCOUNT = 'someone',
 
 
     class DeliveryType(models.TextChoices):
-        FREE = 'free',
-        PAID = 'toll',
+        FREE = 'ordinary',
+        PAID = 'express',
 
 
     class Meta:
@@ -69,7 +69,7 @@ class Order(models.Model):
     email = models.EmailField(null=True, blank=True)
     phone = models.CharField(max_length=15, blank=True, null=True)
     deliveryType = models.CharField(
-        max_length=4,
+        max_length=10,
         choices=DeliveryType.choices,
         default=DeliveryType.FREE,
     )
