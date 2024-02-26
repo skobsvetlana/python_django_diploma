@@ -6,28 +6,13 @@ from order.models import (
     Address,
     Order,
     OrderItem,
+    City,
 )
-
-
-class AddressSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для представления адреса достакви заказа
-    """
-    class Meta:
-        model = Address
-        fields = [
-            "address1",
-            "address2",
-            "zip_code",
-        ]
-
 
 class OrderItemSerializer(serializers.ModelSerializer):
     """
     Сериализатор для представления продукта в заказе
     """
-    # product = CatalogItemSerializer()
-
     class Meta:
         model = OrderItem
         fields = [
@@ -70,12 +55,15 @@ class OrderSerializer(serializers.ModelSerializer):
         return order
 
 
+
 class OrderDetailSerializer(serializers.ModelSerializer):
     """
     Сериализатор для полного представления заказа, включая адреса доставки, статуса и прочее,
     а также родуктов в нем.
     """
     products = OrderItemSerializer(many=True)
+    address = serializers.CharField()
+    city = serializers.CharField()
 
     class Meta:
         model = Order
@@ -89,34 +77,53 @@ class OrderDetailSerializer(serializers.ModelSerializer):
             "paymentType",
             "totalCost",
             "status",
+            "address",
+            "city",
             "products",
         ]
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+        request = self.context.get('request')
 
-        if instance.address is None:
-            address = Address.objects.create(address1="", address2="", city="", zip_code="",)
-            instance.address = address
+        if request and hasattr(request, 'user'):
+            customer = request.user
 
-        representation['city'] = instance.address.city
-        representation['address'] = instance.address.address1
-        instance.save()
+        try:
+            second_last_order = Order.objects.filter(customer=instance.customer).order_by('-createdAt')[1]
+            print("This is not the first order")
+        except IndexError:
+            print("This is the very first order")
+            second_last_order = None
+
+        if second_last_order:
+            representation["fullName"] = second_last_order.fullName
+            representation["email"] = second_last_order.email
+            representation["phone"] = second_last_order.phone
+            representation['city'] = second_last_order.city.name
+            representation['address'] = second_last_order.address.address1
+        else:
+            representation["fullName"] = instance.customer.first_name
+            representation["email"] = instance.customer.email
+            representation["phone"] = instance.customer.profile.phone
+            representation['city'] = instance.city.name
+            representation['address'] = instance.address.address1
+
 
         return representation
 
+
     def update(self, instance, validated_data):
         """
-        Изменяет и возвращает данные получателе заказа, адрес.
+        Изменяет и возвращает данные получателе заказа.
         """
         instance.fullName = validated_data.get('fullName', instance.fullName)
         instance.email = validated_data.get('email', instance.email)
         instance.phone = validated_data.get('phone', instance.phone)
         instance.deliveryType = validated_data.get('deliveryType', instance.deliveryType)
         instance.paymentType = validated_data.get('paymentType', instance.paymentType)
-        instance.address.address1 = validated_data.get('address', instance.address.address1)
-        instance.address.city = validated_data.get('city', instance.address.city)
-        instance.address.save()
+        instance.address = validated_data.get('address', instance.address)
+        instance.city = validated_data.get('city', instance.city)
         instance.save()
 
         return instance

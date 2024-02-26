@@ -10,9 +10,9 @@ from rest_framework import status
 
 from django.shortcuts import get_object_or_404
 
-from cart.models import Cart
+from cart.models import Cart, CartItem
 from my_auth.serializers import UserRegistrationSerializer
-from order.models import Order
+from order.models import Order, Address, City
 from order.serialisers import (
     OrderSerializer,
     OrderDetailSerializer,
@@ -52,12 +52,12 @@ class OrderViewSet(ModelViewSet):
     def create(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             data = request.data
-            Cart.objects.get(user=request.user).delete()
+            cart = Cart.objects.get(user=request.user)
+            CartItem.objects.filter(cart=cart).delete()
         else:
-            print("maymaymay")
             data = request.session.get('cart_data', [])
             request.session['cart_data'] = []
-        print("+++++++++++++++++++++++")
+
         data = filter_data(data)
         serializer = self.get_serializer(data={"products": data})
         serializer.is_valid(raise_exception=True)
@@ -74,17 +74,25 @@ class OrderViewSet(ModelViewSet):
     def perform_create(self, serializer):
         # Создание заказа и его связь с пользователем, если он зарегистрирован
         user = self.request.user
+        city, created = City.objects.get_or_create(name="")
+        address, created = Address.objects.get_or_create(
+            address1="",
+            address2="",
+            zip_code="",
+        )
         validated_data = serializer.validated_data
+
         if self.request.user.is_authenticated:
             validated_data['customer'] = user
             validated_data['fullName'] = user.first_name
             validated_data['email'] = user.email
             validated_data['phone'] = user.profile.phone
+        validated_data['city'] = city
+        validated_data['address'] = address
         serializer.save()
 
 
     def list(self, request: Request, *args, **kwargs) -> Response:
-        # queryset = self.filter_queryset(self.get_queryset())
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
@@ -92,7 +100,10 @@ class OrderViewSet(ModelViewSet):
 
 class OrderDetailViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
-    queryset = Order.objects.all()
+    queryset = (Order.objects
+                .prefetch_related("customer", "address", "city",)
+                .all()
+                )
     serializer_class = OrderDetailSerializer
 
 
@@ -100,7 +111,10 @@ class OrderDetailViewSet(ModelViewSet):
         print("++++++++++++++++++++++++order_update")
         id = kwargs.get("id")
         instance = get_object_or_404(self.queryset, pk=id)
-        print(instance.address)
+        instance.status = 'accepted'
+        if instance.customer == None:
+            user = User.objects.get(pk=request.user.pk)
+            instance.customer = user
 
         serializer = self.get_serializer(
             instance=instance,
@@ -108,20 +122,33 @@ class OrderDetailViewSet(ModelViewSet):
             partial=True
         )
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        self.perform_update(serializer)
+
         return Response(serializer.data, )
 
 
-    def retrieve(self, request: Request, *args, **kwargs) -> Response:
-        print("+++++++++++++++++++++++++++++retrieve")
-        id = kwargs.get("id")
-        item = get_object_or_404(self.queryset, pk=id)
-        if item.customer == None:
-            user = User.objects.filter(pk=request.user.pk).first()
-            item.fullName = user.first_name
-            item.email = user.email
-            item.phone = user.profile.phone
+    def perform_update(self, serializer):
+        validated_data = serializer.validated_data
+        city, created = City.objects.get_or_create(name=validated_data['city'].upper())
+        address, created = Address.objects.get_or_create(address1=validated_data['address'].upper())
+        validated_data['city'] = city
+        validated_data['address'] = address
+        serializer.save()
 
-        serializer = self.get_serializer(item)
-        print("serializer.data", serializer.data)
+
+    def retrieve(self, request: Request, *args, **kwargs) -> Response:
+        print("+++++++++++retrieve")
+        print("request.user.pk", request.user.pk)
+        id = kwargs.get("id")
+        instance = get_object_or_404(self.queryset, pk=id)
+        if instance.customer == None:
+            user = User.objects.get(pk=request.user.pk)
+            instance.customer = user
+
+            # instance.fullName = user.first_name
+            # instance.email = user.email
+            # instance.phone = user.profile.phone
+
+        serializer = self.get_serializer(instance)
+
         return Response(serializer.data)

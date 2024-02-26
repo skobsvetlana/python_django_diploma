@@ -1,9 +1,19 @@
 from django.db import models
-# from django.db.models import Sum, F
 
 from django.contrib.auth.models import User
 
 from catalog.models import Product
+
+
+class City(models.Model):
+    name = models.CharField(
+        null=False,
+        blank=True,
+        max_length=1024,
+    )
+
+    def __str__(self):
+        return self.name
 
 
 class Address(models.Model):
@@ -17,27 +27,20 @@ class Address(models.Model):
         blank=True,
         max_length=1024,
     )
-
     address2 = models.CharField(
         "Address line 2",
         max_length=1024,
         blank=True,
         default="",
     )
-
     zip_code = models.CharField(
         "ZIP / Postal code",
         max_length=12,
     )
 
-    city = models.CharField(
-        "City",
-        null=False,
-        max_length=1024,
-    )
 
     def __str__(self):
-        return f"{self.address1}, unit {self.address2}, {self.city}, {self.zip_code}"
+        return f"{self.address1}, unit {self.address2}, {self.zip_code}"
 
 
 class Order(models.Model):
@@ -84,6 +87,7 @@ class Order(models.Model):
         default=Status.CREATED,
     )
     address = models.ForeignKey(Address, on_delete=models.PROTECT, null=True)
+    city = models.ForeignKey(City, on_delete=models.PROTECT, null=True)
 
 
     def __str__(self):
