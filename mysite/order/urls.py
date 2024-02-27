@@ -1,6 +1,7 @@
 from django.urls import path, include
 
-from order.views import OrderViewSet, OrderDetailViewSet
+from order.views.order_create_view import OrderViewSet
+from order.views.order_update_view import OrderDetailViewSet
 
 from rest_framework.routers import DefaultRouter
 

@@ -1,59 +1,17 @@
-from catalog.serializers import CatalogItemSerializer
-
 from rest_framework import serializers
 
-from order.models import (
-    Address,
-    Order,
-    OrderItem,
-    City,
-)
+from order.models import Order
+from order.serializers.order_create_serializer import OrderItemSerializer
 
-class OrderItemSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для представления продукта в заказе
-    """
-    class Meta:
-        model = OrderItem
-        fields = [
-            "product",
-            "count",
-            "price",
-        ]
+def get_second_last_order(user):
+    try:
+        second_last_order = Order.objects.filter(customer=user).order_by('-createdAt')[1]
+        print("This is not the first order")
+    except IndexError:
+        print("This is the very first order")
+        second_last_order = None
 
-
-    def to_representation(self, instance):
-        data = CatalogItemSerializer(instance.product).data
-        data['count'] = instance.count
-        data['price'] = instance.price
-
-        return data
-
-
-class OrderSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для представления заказа и родуктов в нем.
-    """
-    orderId = serializers.IntegerField(source="pk", read_only=True)
-    products = OrderItemSerializer(many=True)
-
-    class Meta:
-        model = Order
-        fields = [
-            "orderId",
-            "products",
-        ]
-
-
-    def create(self, validated_data):
-        order_items = validated_data.pop("products", [])
-        order = Order.objects.create(**validated_data)
-
-        for item in order_items:
-            OrderItem.objects.create(order=order, **item)
-
-        return order
-
+    return second_last_order
 
 
 class OrderDetailSerializer(serializers.ModelSerializer):
@@ -84,17 +42,12 @@ class OrderDetailSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        request = self.context.get('request')
+        # request = self.context.get('request')
 
-        if request and hasattr(request, 'user'):
-            customer = request.user
+        # if request and hasattr(request, 'user'):
+        #     customer = request.user
 
-        try:
-            second_last_order = Order.objects.filter(customer=instance.customer).order_by('-createdAt')[1]
-            print("This is not the first order")
-        except IndexError:
-            print("This is the very first order")
-            second_last_order = None
+        second_last_order = get_second_last_order(instance.customer)
 
         if second_last_order:
             representation["fullName"] = second_last_order.fullName
@@ -108,7 +61,6 @@ class OrderDetailSerializer(serializers.ModelSerializer):
             representation["phone"] = instance.customer.profile.phone
             representation['city'] = instance.city.name
             representation['address'] = instance.address.address1
-
 
         return representation
 
