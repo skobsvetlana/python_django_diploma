@@ -22,7 +22,7 @@ class OrderDetailViewSet(ModelViewSet):
     def update(self, request: Request, *args, **kwargs):
         id = kwargs.get("id")
         instance = get_object_or_404(self.queryset, pk=id)
-        print("id", id)
+
         if instance.customer == None:
             user = User.objects.get(pk=request.user.pk)
             instance.customer = user
@@ -41,9 +41,6 @@ class OrderDetailViewSet(ModelViewSet):
             data={"orderId": order_id},
             status=status.HTTP_200_OK
         )
-            # payment_url = reverse('payment', kwargs={'id': payment.id})
-            #
-            # return redirect(payment_url)
 
 
     def perform_update(self, serializer):
@@ -60,7 +57,7 @@ class OrderDetailViewSet(ModelViewSet):
             order_id = kwargs.get("id")
         except TypeError:
             order_id = request.session.get('order_id')
-        print("retrieve order_id", order_id)
+
         instance = get_object_or_404(self.queryset, pk=order_id)
         serializer = self.get_serializer(instance)
 

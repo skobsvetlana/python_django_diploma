@@ -39,7 +39,6 @@ class OrderViewSet(ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         order_id = request.session.get('order_id')
-        print("order_id from session", order_id)
 
         if order_id is not None:
             return Response(
