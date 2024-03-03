@@ -14,7 +14,6 @@ def filter_data(data):
 
     for item in data:
         item["product"] = item.pop("id")
-        print(item["product"])
 
     return data
 
@@ -39,6 +38,15 @@ class OrderViewSet(ModelViewSet):
 
 
     def create(self, request, *args, **kwargs):
+        order_id = request.session.get('order_id')
+        request.session['payment_id'] = None
+
+        if order_id is not None:
+            return Response(
+                data={"orderId": order_id},
+                status=status.HTTP_200_OK,
+            )
+
         if request.user.is_authenticated:
             data = request.data
             cart = Cart.objects.get(user=request.user)
@@ -52,9 +60,11 @@ class OrderViewSet(ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
+        order_id = serializer.instance.pk
+        request.session['order_id'] = order_id
 
         return Response(
-            data={"orderId": serializer.instance.pk},
+            data={"orderId": order_id},
             status=status.HTTP_201_CREATED,
             headers=headers,
         )

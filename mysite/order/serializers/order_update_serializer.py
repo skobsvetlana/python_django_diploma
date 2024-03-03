@@ -6,9 +6,7 @@ from order.serializers.order_create_serializer import OrderItemSerializer
 def get_second_last_order(user):
     try:
         second_last_order = Order.objects.filter(customer=user).order_by('-createdAt')[1]
-        print("This is not the first order")
     except IndexError:
-        print("This is the very first order")
         second_last_order = None
 
     return second_last_order
@@ -40,14 +38,22 @@ class OrderDetailSerializer(serializers.ModelSerializer):
             "products",
         ]
 
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        # request = self.context.get('request')
 
-        # if request and hasattr(request, 'user'):
-        #     customer = request.user
+        if instance.customer == None:
+            try:
+                request = self.context.get('request')
+                customer = request.__getattribute__("user")
+            except TypeError:
+                customer = instance.customer
+                print("Type Error: customer is None")
+        else:
+            customer = instance.customer
 
-        second_last_order = get_second_last_order(instance.customer)
+        second_last_order = get_second_last_order(customer)
+        print("second_last_order", second_last_order)
 
         if second_last_order:
             representation["fullName"] = second_last_order.fullName
@@ -56,11 +62,9 @@ class OrderDetailSerializer(serializers.ModelSerializer):
             representation['city'] = second_last_order.city.name
             representation['address'] = second_last_order.address.address1
         else:
-            representation["fullName"] = instance.customer.first_name
-            representation["email"] = instance.customer.email
-            representation["phone"] = instance.customer.profile.phone
-            representation['city'] = instance.city.name
-            representation['address'] = instance.address.address1
+            representation["fullName"] = customer.first_name
+            representation["email"] = customer.email
+            representation["phone"] = customer.profile.phone
 
         return representation
 

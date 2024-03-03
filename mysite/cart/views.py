@@ -1,5 +1,3 @@
-from django.core import serializers
-
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.viewsets import ModelViewSet
@@ -44,6 +42,7 @@ class CartItemViewSet(ModelViewSet):
         product_id = request.data["id"]
         count = request.data["count"]
         product = Product.objects.get(id=product_id)
+        request.session['order_id'] = None
 
         if request.user.is_authenticated:
             cart, created = Cart.objects.get_or_create(user=request.user)

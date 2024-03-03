@@ -1,14 +1,18 @@
 from django.db import models
 
+from order.models import Order
+
+
 class Payment(models.Model):
-    number = models.CharField(null=False, max_length=16)
-    name = models.CharField(max_length=100)
-    month = models.CharField(null=False, max_length=2)
-    year = models.CharField(null=False, max_length=4)
-    code = models.CharField(null=False, max_length=3)
+    order = models.ForeignKey(Order, on_delete=models.PROTECT, null=False)
+    number = models.CharField(null=False, max_length=8, blank=True, default="")
+    name = models.CharField(max_length=100, blank=True, default="")
+    month = models.CharField(null=False, max_length=2, blank=True, default="")
+    year = models.CharField(null=False, max_length=4, blank=True, default="")
+    code = models.CharField(null=False, max_length=3, blank=True, default="")
 
     def __str__(self):
-        return (f"name: {self.name}   "
-                f"number: {self.number}   "
+        return (f"name: {self.name}/n   "
+                f"number: {self.number}/n   "
                 f"month/year {self.month}/{self.year} code: {self.code}")
 

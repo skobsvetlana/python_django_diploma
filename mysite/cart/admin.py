@@ -30,7 +30,7 @@ class CartItemAdmin(admin.ModelAdmin):
         "count",
         ]
     list_display_links = "cart", "product",
-    #search_fields = "product",
+    search_fields = "product",
 
 
 
