@@ -5,7 +5,7 @@ from order.models import Order
 
 class Payment(models.Model):
     order = models.ForeignKey(Order, on_delete=models.PROTECT, null=False)
-    number = models.CharField(null=False, max_length=8, blank=True, default="")
+    number = models.CharField(null=False, max_length=16, blank=True, default="")
     name = models.CharField(max_length=100, blank=True, default="")
     month = models.CharField(null=False, max_length=2, blank=True, default="")
     year = models.CharField(null=False, max_length=4, blank=True, default="")

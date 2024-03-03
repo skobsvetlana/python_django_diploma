@@ -8,7 +8,7 @@ from rest_framework.routers import DefaultRouter
 app_name = "order"
 
 routers = DefaultRouter()
-routers.register("order", OrderViewSet, basename="order")
+# routers.register("order", OrderDetailViewSet, basename="order")
 routers.register("orders", OrderViewSet, basename="orders")
 
 urlpatterns = [
@@ -31,7 +31,6 @@ urlpatterns = [
                     'post': 'update',
                 }
             )),
-    #path("orders/<int:id>", OrderDetailViewSet.as_view({'get': 'retrieve'})),
     path("order/<int:id>/", OrderDetailViewSet.as_view(
                 {
                     'get': 'retrieve',

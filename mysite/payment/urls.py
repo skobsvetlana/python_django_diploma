@@ -12,4 +12,5 @@ routers.register("payment", PaymentViewset, basename="payment")
 urlpatterns = [
     path("", include(routers.urls)),
     path("payment/<int:id>/", PaymentViewset.as_view({'post': 'create'})),
+    path("payment/<int:id>", PaymentViewset.as_view({'post': 'create'})),
     ]

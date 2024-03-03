@@ -6,12 +6,17 @@ from rest_framework import serializers
 from profiles.models import Profile
 
 class ProfileSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.username', required=True)
+    queryset = User.objects.all()
+    username = serializers.CharField(
+        source='user.username',
+        required=True,
+        validators=[UniqueValidator(queryset=queryset)]
+    )
     fullName = serializers.CharField(source="user.first_name", required=True)
     email = serializers.EmailField(
         source='user.email',
         required=True,
-        validators=[UniqueValidator(queryset=User.objects.all())]
+        validators=[UniqueValidator(queryset=queryset)]
     )
     phone = serializers.CharField(required=True)
     avatar = serializers.DictField(required=False)
