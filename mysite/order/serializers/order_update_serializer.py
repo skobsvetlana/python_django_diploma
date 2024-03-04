@@ -41,30 +41,31 @@ class OrderDetailSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+        if self.context.get('view').action != 'list':
 
-        if instance.customer == None:
-            try:
-                request = self.context.get('request')
-                customer = request.__getattribute__("user")
-            except TypeError:
+            if instance.customer == None:
+                try:
+                    request = self.context.get('request')
+                    customer = request.__getattribute__("user")
+                except TypeError:
+                    customer = instance.customer
+                    print("Type Error: customer is None")
+            else:
                 customer = instance.customer
-                print("Type Error: customer is None")
-        else:
-            customer = instance.customer
 
-        second_last_order = get_second_last_order(customer)
-        print("second_last_order", second_last_order)
+            second_last_order = get_second_last_order(customer)
+            print("second_last_order", second_last_order)
 
-        if second_last_order:
-            representation["fullName"] = second_last_order.fullName
-            representation["email"] = second_last_order.email
-            representation["phone"] = second_last_order.phone
-            representation['city'] = second_last_order.city.name
-            representation['address'] = second_last_order.address.address1
-        else:
-            representation["fullName"] = customer.first_name
-            representation["email"] = customer.email
-            representation["phone"] = customer.profile.phone
+            if second_last_order:
+                representation["fullName"] = second_last_order.fullName
+                representation["email"] = second_last_order.email
+                representation["phone"] = second_last_order.phone
+                representation['city'] = second_last_order.city.name
+                representation['address'] = second_last_order.address.address1
+            else:
+                representation["fullName"] = customer.first_name
+                representation["email"] = customer.email
+                representation["phone"] = customer.profile.phone
 
         return representation
 
