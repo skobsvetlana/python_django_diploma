@@ -104,19 +104,6 @@ class ProductFullSerializer(serializers.ModelSerializer):
         return data
 
 
-class ProductShortSerializer(serializers.ModelSerializer):
-    images = ImagesSerializer(many=True, required=False)
-
-    class Meta:
-        model = Product
-        fields = [
-            "id",
-            "title",
-            "price",
-            "images",
-        ]
-
-
 class SaleItemSerializer(serializers.ModelSerializer):
     images = ImagesSerializer(required=False, source="product.images", many=True)
     id = serializers.CharField(source='product.id')

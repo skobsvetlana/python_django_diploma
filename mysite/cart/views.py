@@ -18,6 +18,16 @@ def find_index_by_key(data, key, value):
             return index
 
 
+def filter_data(data):
+    keys = ["id", "count"]
+    data = [{key: item.get(key, None) for key in keys} for item in data]
+
+    for item in data:
+        item["product"] = item.pop("id")
+
+    return data
+
+
 class CartViewSet(ModelViewSet):
     serializer_class = CartSerializer
     queryset = Cart.objects.all()
@@ -82,7 +92,7 @@ class CartItemViewSet(ModelViewSet):
         if request.user.is_authenticated:
             serializer = self.get_serializer(self.get_queryset(), many=True)
         else:
-            # здесь totalCount заменить на count
+            #здесь totalCount заменить на count
             cart_items = request.session.get('cart_data', [])
             product_ids = [item.get('id') for item in cart_items]
             products = Product.objects.filter(pk__in=product_ids)

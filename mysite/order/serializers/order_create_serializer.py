@@ -1,3 +1,4 @@
+from catalog.models import Product
 from catalog.serializers import CatalogItemSerializer
 
 from rest_framework import serializers
@@ -59,6 +60,15 @@ class OrderSerializer(serializers.ModelSerializer):
         order = Order.objects.create(**validated_data)
 
         for item in order_items:
+            product = item.get("product")
+            count = item.get("count")
+
+            if product.totalCount < count:
+                raise serializers.ValidationError(
+                    f"Not enough stock for product {product}. Only {product.totalCount} available.")
+
             OrderItem.objects.create(order=order, **item)
+            product.totalCount -= count
+            product.save()
 
         return order
