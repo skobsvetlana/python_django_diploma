@@ -1,5 +1,6 @@
 from django.urls import path, include
 
+from catalog.views.catalog_category_view import CatalogCategoryViewSet
 from catalog.views.category_view import CategoryViewSet
 from catalog.views.catalog_view import CatalogViewSet
 from catalog.views.product_detail_view import ProductDetailViewSet
@@ -32,8 +33,8 @@ urlpatterns = [
     path("products/limited", ProductLimitedViewSet.as_view({'get': 'list'}), name='product_limited'),
     path("banners", BannersViewSet.as_view({'get': 'list'}), name='banners'),
     path("catalog", CatalogViewSet.as_view({'get': 'list'}), name='product_list'),
+    path("catalog/<int:id>/", CatalogCategoryViewSet.as_view({'get': 'list'}), name='category_product_list'),
     path("sales", SalesViewSet.as_view({'get': 'list'}), name='sales_list'),
     path("categories", CategoryViewSet.as_view({'get': 'list'}), name='categories_list'),
-    # path("categories/", CategoryViewSet.as_view({'get': 'list'}), name='_categories_list'),
     path("tags", TagViewSet.as_view({'get': 'list'}), name='tags_list'),
 ]

@@ -8,6 +8,7 @@ from rest_framework.viewsets import ModelViewSet
 from catalog.serializers.catalogItem_serializer import CatalogItemSerializer
 from catalog.models.product_model import Product
 
+
 class CatalogPagination(pagination.PageNumberPagination):
     page_size = 20
     max_page_size = 50
@@ -20,11 +21,11 @@ class CatalogPagination(pagination.PageNumberPagination):
         )))
 
 
-class CatalogViewSet(ModelViewSet):
+class CatalogCategoryViewSet(ModelViewSet):
     serializer_class = CatalogItemSerializer
     queryset = (
         Product.objects
-        .prefetch_related("tags", "images",).all()
+        .prefetch_related("tags", "images", ).all()
     )
     pagination_class = CatalogPagination
 
@@ -36,12 +37,18 @@ class CatalogViewSet(ModelViewSet):
         freeDelivery = self.request.GET["filter[freeDelivery]"]
         sort = self.request.GET["sort"]
         limit = self.request.GET["limit"]
+        category = self.request.GET["category"]
+        print("hgjgjgugugu", kwargs)
 
         if sortType == 'dec':
             sort = f'-{sort}'
 
         queryset = (self.queryset
-                    .filter(price__gte=float(minPrice), price__lte=float(maxPrice))
+                    .filter(
+            price__gte=float(minPrice),
+            price__lte=float(maxPrice),
+            category=category
+        )
                     .order_by(sort))
 
         if available == "true":
@@ -52,7 +59,6 @@ class CatalogViewSet(ModelViewSet):
 
         print("freeDelivery=", freeDelivery)
         return queryset
-
 
     def list(self, request: Request, *args, **kwargs) -> Response:
         queryset = self.get_queryset()

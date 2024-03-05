@@ -1,5 +1,5 @@
-from catalog.models import Product
-from catalog.serializers import CatalogItemSerializer
+from catalog.models.product_model import Product
+from catalog.serializers.catalogItem_serializer import CatalogItemSerializer
 
 from rest_framework import serializers
 

@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.viewsets import ModelViewSet
 
-from catalog.serializers import ReviewsSerializer
-from catalog.models import Review
+from catalog.serializers.review_serializer import ReviewsSerializer
+from catalog.models.product_model import Review
 
 class ReviewViewSet(ModelViewSet):
     queryset = Review.objects.prefetch_related("author", "product",).all()

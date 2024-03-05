@@ -2,9 +2,9 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.viewsets import ModelViewSet
 
-from catalog.serializers import ProductFullSerializer
+from catalog.serializers.productFull_serializer import ProductFullSerializer
 
-from catalog.models import Product
+from catalog.models.product_model import Product
 
 from django.shortcuts import get_object_or_404
 

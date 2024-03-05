@@ -1,9 +1,11 @@
-from django.contrib.auth.models import User
-from catalog.serializers import CatalogItemSerializer
+from catalog.models.product_model import Product
+from catalog.models.saleItem_model import SaleItem
+
+from catalog.serializers.catalogItem_serializer import CatalogItemSerializer
 
 from rest_framework import serializers
 
-from catalog.models import SaleItem, Product
+
 from cart.models import (
     Cart,
     CartItem,

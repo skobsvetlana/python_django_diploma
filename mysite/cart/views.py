@@ -3,10 +3,11 @@ from rest_framework.request import Request
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
 
-from cart.models import Product, Cart, CartItem
-from catalog.models import SaleItem
+from cart.models import Cart, CartItem
+from catalog.models.product_model import Product
+from catalog.models.saleItem_model import SaleItem
 
-from catalog.serializers import CatalogItemSerializer
+from catalog.serializers.catalogItem_serializer import CatalogItemSerializer
 from cart.serializers import (
     CartItemSerializer,
     CartSerializer,
@@ -56,9 +57,12 @@ class CartItemViewSet(ModelViewSet):
 
         if request.user.is_authenticated:
             cart, created = Cart.objects.get_or_create(user=request.user)
-
             cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
-            cart_item.count += int(count)
+
+            if int(product.totalCount) > cart_item.count + int(count):
+                cart_item.count += int(count)
+            else:
+                cart_item.count = product.totalCount
 
             cart_item.save()
 

@@ -2,7 +2,7 @@ from django.db import models
 
 from django.contrib.auth.models import User
 
-from catalog.models import Product
+from catalog.models.product_model import Product
 
 
 class City(models.Model):

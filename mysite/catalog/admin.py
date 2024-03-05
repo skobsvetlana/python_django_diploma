@@ -2,14 +2,12 @@ from django.contrib import admin
 from django.db.models import QuerySet
 from django.http import HttpRequest
 
-from catalog.models import (Product,
-                            Category,
-                            Tag,
-                            Review,
-                            Images,
-                            Specification,
-                            SaleItem,
-                            )
+from catalog.models.product_model import Product, Review
+from catalog.models.category_model import Category
+from catalog.models.tag_model import Tag
+from catalog.models.images_model import Images
+from catalog.models.specification_model import Specification
+from catalog.models.saleItem_model import SaleItem
 
 
 @admin.action(description="limited_addition ON")

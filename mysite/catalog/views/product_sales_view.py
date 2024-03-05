@@ -5,8 +5,8 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.viewsets import ModelViewSet
 
-from catalog.serializers import SaleItemSerializer
-from catalog.models import SaleItem
+from catalog.serializers.saleItem_serializer import SaleItemSerializer
+from catalog.models.saleItem_model import SaleItem
 
 class SaleItemPagination(pagination.PageNumberPagination):
     page_size = 20

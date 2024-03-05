@@ -2,8 +2,8 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.viewsets import ModelViewSet
 
-from catalog.serializers import CatalogItemSerializer
-from catalog.models import Product
+from catalog.serializers.catalogItem_serializer import CatalogItemSerializer
+from catalog.models.product_model import Product
 
 class BannersViewSet(ModelViewSet):
     queryset = (
