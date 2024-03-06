@@ -27,5 +27,5 @@ urlpatterns = [
     path("", include(routers.urls)),
     path("product/<int:id>", ProductDetailViewSet.as_view({'get': 'retrieve'}), name='product_detail'),
     path("product/<int:id>/", ProductDetailViewSet.as_view({'get': 'retrieve'}), name='_product_detail'),
-    path("product/<int:id>/reviews", ReviewViewSet.as_view({'post': 'perform_create'}), name='product_review'),
+    path("product/<int:id>/reviews", ReviewViewSet.as_view({'post': 'create'}), name='product_review'),
 ]
