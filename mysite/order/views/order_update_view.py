@@ -1,15 +1,15 @@
 from django.contrib.auth.models import User
-from django.urls import reverse
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
 
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
 
 from order.models import Order, Address, City
 from order.serializers.order_update_serializer import OrderDetailSerializer
+
 
 class OrderDetailViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -18,6 +18,7 @@ class OrderDetailViewSet(ModelViewSet):
                 .all()
                 )
     serializer_class = OrderDetailSerializer
+
 
     def update(self, request: Request, *args, **kwargs):
         id = kwargs.get("id")
@@ -28,6 +29,7 @@ class OrderDetailViewSet(ModelViewSet):
             instance.customer = user
 
         instance.status = 'accepted'
+
         serializer = self.get_serializer(
             instance=instance,
             data=request.data,

@@ -1,9 +1,9 @@
 from django.contrib import admin
 
 from order.models import (
-                     Order,
-                     OrderItem,
-                     )
+    Order,
+    OrderItem, DeliveryCost,
+)
 
 class OrderItemInline(admin.StackedInline):
     model = OrderItem
@@ -40,3 +40,15 @@ class OrderItemAdmin(admin.ModelAdmin):
         ]
     list_display_links = "order", "product",
     search_fields = "order",  "product",
+
+
+@admin.register(DeliveryCost)
+class DeliveryCostAdmin(admin.ModelAdmin):
+    list_display = [
+        "ordinary",
+        "express",
+        "minCostForFreeDelivery",
+        "dateFrom",
+        "dateTo",
+        ]
+

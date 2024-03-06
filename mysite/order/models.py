@@ -5,6 +5,14 @@ from django.contrib.auth.models import User
 from catalog.models.product_model import Product
 
 
+class DeliveryCost(models.Model):
+    ordinary = models.DecimalField(null=False, max_digits=10, decimal_places=2, default=0)
+    express = models.DecimalField(null=False, max_digits=10, decimal_places=2, default=0)
+    minCostForFreeDelivery = models.DecimalField(null=False, max_digits=10, decimal_places=2, default=0)
+    dateFrom = models.DateTimeField(auto_now_add=True)
+    dateTo = models.DateTimeField(null=True, blank=True, default=None)
+
+
 class City(models.Model):
     name = models.CharField(
         null=False,
@@ -57,8 +65,8 @@ class Order(models.Model):
 
 
     class DeliveryType(models.TextChoices):
-        FREE = 'ordinary',
-        PAID = 'express',
+        ORDINARY = 'ordinary',
+        EXPRESS = 'express',
 
 
     class Meta:
@@ -74,7 +82,7 @@ class Order(models.Model):
     deliveryType = models.CharField(
         max_length=10,
         choices=DeliveryType.choices,
-        default=DeliveryType.FREE,
+        default=DeliveryType.ORDINARY,
     )
     paymentType = models.CharField(
         max_length=20,
@@ -100,6 +108,23 @@ class Order(models.Model):
     def totalCost(self):
         total = sum(item.get_cost() for item in self.products.all())
         return total if total is not None else 0
+
+
+    @property
+    def deliveryCost(self):
+        delivery = 0
+        delivery_costs = DeliveryCost.objects.order_by("-dateFrom").first()
+
+        if self.totalCost < delivery_costs.minCostForFreeDelivery:
+            delivery = delivery_costs.ordinary
+
+        if self.deliveryType == "express":
+            delivery += delivery_costs.express
+
+        return delivery
+
+
+
 
     # @property
     # def totalCost(self):
