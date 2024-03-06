@@ -26,7 +26,7 @@ class CatalogViewSet(ModelViewSet):
     serializer_class = CatalogItemSerializer
     queryset = (
         Product.objects
-        .prefetch_related("tags", "images",).all()
+        .prefetch_related("tags", "images", "category").all()
     )
     pagination_class = CatalogPagination
 
@@ -52,11 +52,14 @@ class CatalogViewSet(ModelViewSet):
                     .order_by(sort))
 
         if category_id is not None:
-            subcategories = (Category.objects
-                             .filter(parent=category_id)
-                             .values_list('pk', flat=True)
-                             )
-            if len(subcategories) == 0:
+            category = Category.objects.get(pk=category_id)
+
+            if category.parent is None:
+                subcategories = (Category.objects
+                                 .filter(parent=category_id)
+                                 .values_list('pk', flat=True)
+                                 )
+            else:
                 subcategories = category_id,
             queryset = queryset.filter(category__id__in=subcategories)
 
@@ -66,7 +69,6 @@ class CatalogViewSet(ModelViewSet):
         if freeDelivery == "true":
             queryset = queryset.filter(free_delivery=True)
 
-        print("freeDelivery=", freeDelivery)
         return queryset
 
 
