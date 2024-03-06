@@ -1,10 +1,12 @@
 from collections import OrderedDict
 
+from django.utils.datastructures import MultiValueDictKeyError
 from rest_framework import pagination, status
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.viewsets import ModelViewSet
 
+from catalog.models.category_model import Category
 from catalog.serializers.catalogItem_serializer import CatalogItemSerializer
 from catalog.models.product_model import Product
 
@@ -37,12 +39,26 @@ class CatalogViewSet(ModelViewSet):
         sort = self.request.GET["sort"]
         limit = self.request.GET["limit"]
 
+        try:
+            category_id = self.request.GET["category"]
+        except MultiValueDictKeyError:
+            category_id = None
+
         if sortType == 'dec':
             sort = f'-{sort}'
 
         queryset = (self.queryset
                     .filter(price__gte=float(minPrice), price__lte=float(maxPrice))
                     .order_by(sort))
+
+        if category_id is not None:
+            subcategories = (Category.objects
+                             .filter(parent=category_id)
+                             .values_list('pk', flat=True)
+                             )
+            if len(subcategories) == 0:
+                subcategories = category_id,
+            queryset = queryset.filter(category__id__in=subcategories)
 
         if available == "true":
             queryset = queryset.filter(totalCount__gt=0)

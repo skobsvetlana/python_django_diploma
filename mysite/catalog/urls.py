@@ -1,6 +1,5 @@
 from django.urls import path, include
 
-from catalog.views.catalog_category_view import CatalogCategoryViewSet
 from catalog.views.category_view import CategoryViewSet
 from catalog.views.catalog_view import CatalogViewSet
 from catalog.views.product_detail_view import ProductDetailViewSet
@@ -29,5 +28,4 @@ urlpatterns = [
     path("product/<int:id>", ProductDetailViewSet.as_view({'get': 'retrieve'}), name='product_detail'),
     path("product/<int:id>/", ProductDetailViewSet.as_view({'get': 'retrieve'}), name='_product_detail'),
     path("product/<int:id>/reviews", ReviewViewSet.as_view({'post': 'perform_create'}), name='product_review'),
-    path("catalog/<int:id>/", CatalogCategoryViewSet.as_view({'get': 'list'}), name='category_product_list'),
 ]
