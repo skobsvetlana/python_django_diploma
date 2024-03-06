@@ -32,8 +32,8 @@ class SalesViewSet(ModelViewSet):
             page = self.paginate_queryset(queryset)
             if page:
                 data = self.get_serializer(page, many=True).data
-                print("++++++++++++++++++++++++sale_item_list")
-                print("sale", len(data))
+
                 return self.get_paginated_response(data)
+
         return Response(status=status.HTTP_404_NOT_FOUND)
 

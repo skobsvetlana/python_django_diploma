@@ -9,7 +9,3 @@ class TagViewSet(ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
 
-    def list(self, request: Request, *args, **kwargs) -> Response:
-        items = self.get_serializer(self.queryset, many=True).data
-
-        return Response(items)

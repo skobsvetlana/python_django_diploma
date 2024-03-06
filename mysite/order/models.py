@@ -124,8 +124,6 @@ class Order(models.Model):
         return delivery
 
 
-
-
     # @property
     # def totalCost(self):
     #     total = self.products.aggregate(total_cost=Sum(F('price') * F('count')))['total_cost']
