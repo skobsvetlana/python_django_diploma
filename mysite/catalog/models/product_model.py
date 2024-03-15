@@ -51,9 +51,10 @@ class Product(models.Model):
 
 
 class Review(models.Model):
-    author = models.ForeignKey(User, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
     text = models.TextField(null=False, blank=True)
     rate = models.PositiveSmallIntegerField(null=False, blank=False, default=0)
     date = models.DateTimeField(auto_now_add=True)
     email = models.EmailField(null=True, blank=True)
+    author = models.CharField(max_length=150, null=True, blank=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=False, blank=False, related_name="reviews")

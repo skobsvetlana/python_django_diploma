@@ -19,16 +19,14 @@ class ReviewViewSet(ModelViewSet):
         product_id = kwargs["id"]
         data = request.data
         user = self.request.user
-        product = Product.objects.get(pk=product_id)
+        #product = Product.objects.get(pk=product_id)
 
         if data["author"] == "":
-            data["author"] = user.pk
+            data["author"] = "Anonymous"
 
-        if data["email"] == "":
-            data["email"] = user.email
+        data["user"] = user.pk
+        data["product"] = product_id
 
-        data["product"] = product.pk
-        print(data)
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()

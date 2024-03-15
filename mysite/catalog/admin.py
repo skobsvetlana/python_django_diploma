@@ -100,5 +100,5 @@ class SpecificationAdmin(admin.ModelAdmin):
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = "pk", "author", "product", "text", "rate", "date",
-    list_display_links = "pk", "product", "text"
+    list_display = "pk", "author", "user", "email", "product", "text", "rate", "date",
+    list_display_links = "pk", "author","product", "text"

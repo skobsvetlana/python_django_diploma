@@ -2,7 +2,6 @@ from catalog.models.product_model import Review
 
 from rest_framework import serializers
 
-
 class ReviewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
@@ -14,8 +13,11 @@ class ReviewsSerializer(serializers.ModelSerializer):
 
         return review
 
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        data["author"] = instance.author.first_name
+    def validate(self, data):
+        product = data.get('product')
+        user = self.context['request'].user
+
+        if Review.objects.filter(product=product, user=user).exists():
+            raise serializers.ValidationError("This user has already added a review for this product.")
 
         return data

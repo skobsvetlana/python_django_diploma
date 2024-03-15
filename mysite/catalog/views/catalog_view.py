@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from typing import List
 
 from django.utils.datastructures import MultiValueDictKeyError
 from rest_framework import pagination, status
@@ -9,6 +10,7 @@ from rest_framework.viewsets import ModelViewSet
 from catalog.models.category_model import Category
 from catalog.serializers.catalogItem_serializer import CatalogItemSerializer
 from catalog.models.product_model import Product
+
 
 class CatalogPagination(pagination.PageNumberPagination):
     page_size = 20
@@ -30,6 +32,20 @@ class CatalogViewSet(ModelViewSet):
     )
     pagination_class = CatalogPagination
 
+    def get_subcategories(self, category_id: int) -> List:
+        category = Category.objects.get(pk=category_id)
+
+        if category.parent is None:
+            subcategories = (Category.objects
+                             .filter(parent=category_id)
+                             .values_list('pk', flat=True)
+                             )
+        else:
+            subcategories = category_id,
+
+        return subcategories
+
+
     def get_queryset(self, *args, **kwargs):
         minPrice = self.request.GET["filter[minPrice]"]
         maxPrice = self.request.GET["filter[maxPrice]"]
@@ -47,27 +63,34 @@ class CatalogViewSet(ModelViewSet):
         if sortType == 'dec':
             sort = f'-{sort}'
 
-        queryset = (self.queryset
-                    .filter(price__gte=float(minPrice), price__lte=float(maxPrice))
-                    .order_by(sort))
-
-        if category_id is not None:
-            category = Category.objects.get(pk=category_id)
-
-            if category.parent is None:
-                subcategories = (Category.objects
-                                 .filter(parent=category_id)
-                                 .values_list('pk', flat=True)
-                                 )
-            else:
-                subcategories = category_id,
-            queryset = queryset.filter(category__id__in=subcategories)
+        filter_dict = {
+            "price__gte": float(minPrice),
+            "price__lte": float(maxPrice)
+        }
 
         if available == "true":
-            queryset = queryset.filter(totalCount__gt=0)
-
+            filter_dict["totalCount__gt"] = 0
         if freeDelivery == "true":
-            queryset = queryset.filter(free_delivery=True)
+            filter_dict["free_delivery"] = True
+        if category_id is not None:
+            subcategories = self.get_subcategories(category_id)
+            filter_dict["category__id__in"] = subcategories
+
+        queryset = self.queryset.filter(**filter_dict).order_by(sort)
+
+        # queryset = (self.queryset
+        #             .filter(price__gte=float(minPrice), price__lte=float(maxPrice))
+        #             .order_by(sort))
+        #
+        # if category_id is not None:
+        #     subcategories = self.get_subcategories(category_id)
+        #     queryset = queryset.filter(category__id__in=subcategories)
+        #
+        # if available == "true":
+        #     queryset = queryset.filter(totalCount__gt=0)
+        #
+        # if freeDelivery == "true":
+        #     queryset = queryset.filter(free_delivery=True)
 
         return queryset
 
