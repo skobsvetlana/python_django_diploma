@@ -1,7 +1,7 @@
 from collections import OrderedDict
 from typing import List
 
-from django.db.models import F
+from django.db.models import F, Avg, Count
 from django.db.models.functions import Coalesce
 from django.utils.datastructures import MultiValueDictKeyError
 from rest_framework import pagination, status
@@ -37,10 +37,8 @@ class CatalogViewSet(ModelViewSet):
                 F('price')
             )
         )
-        .all()
     )
     pagination_class = CatalogPagination
-
 
     def get_subcategories(self, category_id: int) -> List:
         category = Category.objects.get(pk=category_id)
@@ -54,7 +52,6 @@ class CatalogViewSet(ModelViewSet):
             subcategories = category_id,
 
         return subcategories
-
 
     def get_queryset(self, *args, **kwargs):
         minPrice = self.request.GET["filter[minPrice]"]
@@ -82,12 +79,29 @@ class CatalogViewSet(ModelViewSet):
         if category_id is not None:
             subcategories = self.get_subcategories(category_id)
             filter_dict["category__id__in"] = subcategories
-        if sort == "price":
+        if sort == "reviews":
+            queryset = (Product.objects
+            .prefetch_related("tags", "images", "category")
+            .annotate(
+                review_count=Count("reviews")
+            ))
+            sort = "review_count"
+        elif sort == "rating":
+            queryset = (Product.objects
+            .prefetch_related("tags", "images", "category")
+            .annotate(
+                avg_rating=Avg("reviews__rate")
+            ))
+            sort = "avg_rating"
+        elif sort == "price":
             sort = "conditional_price"
+            queryset = self.queryset
+        else:
+            queryset = self.queryset
         if sortType == 'dec':
             sort = f'-{sort}'
 
-        queryset = self.queryset.filter(**filter_dict).order_by(sort)
+        queryset = queryset.filter(**filter_dict).order_by(sort)
 
         return queryset
 
