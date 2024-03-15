@@ -20,8 +20,10 @@ class BannersViewSet(ModelViewSet):
     def get_queryset(self):
         min_price_subquery = Product.objects.filter(category=OuterRef('category')).values('category').annotate(
             min_price=Min('price')).values('min_price')
-        products_with_min_price = Product.objects.annotate(min_price_in_category=Subquery(min_price_subquery)).filter(
-            price=F('min_price_in_category'))
+        products_with_min_price = (Product.objects
+        .prefetch_related('tags', 'images')
+        .annotate(min_price_in_category=Subquery(min_price_subquery)).filter(
+            price=F('min_price_in_category')))
 
         # products_with_min_price = Product.objects.annotate(
         #     min_price=Coalesce(

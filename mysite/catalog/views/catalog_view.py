@@ -1,6 +1,8 @@
 from collections import OrderedDict
 from typing import List
 
+from django.db.models import F
+from django.db.models.functions import Coalesce
 from django.utils.datastructures import MultiValueDictKeyError
 from rest_framework import pagination, status
 from rest_framework.response import Response
@@ -28,9 +30,17 @@ class CatalogViewSet(ModelViewSet):
     serializer_class = CatalogItemSerializer
     queryset = (
         Product.objects
-        .prefetch_related("tags", "images", "category").all()
+        .prefetch_related("tags", "images", "category")
+        .annotate(
+            conditional_price=Coalesce(
+                F("saleitem__salePrice"),
+                F('price')
+            )
+        )
+        .all()
     )
     pagination_class = CatalogPagination
+
 
     def get_subcategories(self, category_id: int) -> List:
         category = Category.objects.get(pk=category_id)
@@ -60,9 +70,6 @@ class CatalogViewSet(ModelViewSet):
         except MultiValueDictKeyError:
             category_id = None
 
-        if sortType == 'dec':
-            sort = f'-{sort}'
-
         filter_dict = {
             "price__gte": float(minPrice),
             "price__lte": float(maxPrice)
@@ -75,22 +82,12 @@ class CatalogViewSet(ModelViewSet):
         if category_id is not None:
             subcategories = self.get_subcategories(category_id)
             filter_dict["category__id__in"] = subcategories
+        if sort == "price":
+            sort = "conditional_price"
+        if sortType == 'dec':
+            sort = f'-{sort}'
 
         queryset = self.queryset.filter(**filter_dict).order_by(sort)
-
-        # queryset = (self.queryset
-        #             .filter(price__gte=float(minPrice), price__lte=float(maxPrice))
-        #             .order_by(sort))
-        #
-        # if category_id is not None:
-        #     subcategories = self.get_subcategories(category_id)
-        #     queryset = queryset.filter(category__id__in=subcategories)
-        #
-        # if available == "true":
-        #     queryset = queryset.filter(totalCount__gt=0)
-        #
-        # if freeDelivery == "true":
-        #     queryset = queryset.filter(free_delivery=True)
 
         return queryset
 
