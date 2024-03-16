@@ -72,7 +72,7 @@ class CatalogViewSet(ModelViewSet):
             tags = self.request.GET["tags[]"]
         except MultiValueDictKeyError:
             tags = None
-        print(tags)
+        print("tags", self.request.GET["tags[]"])
         filter_dict = {
             "price__gte": float(minPrice),
             "price__lte": float(maxPrice)
