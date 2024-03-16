@@ -67,6 +67,7 @@ class CatalogViewSet(ModelViewSet):
         except MultiValueDictKeyError:
             category_id = None
         print(self.request.GET)
+
         try:
             tags = self.request.GET["tags[]"]
         except MultiValueDictKeyError:
@@ -79,13 +80,17 @@ class CatalogViewSet(ModelViewSet):
 
         if available == "true":
             filter_dict["totalCount__gt"] = 0
+
         if freeDelivery == "true":
             filter_dict["free_delivery"] = True
+
         if category_id is not None:
             subcategories = self.get_subcategories(category_id)
             filter_dict["category__id__in"] = subcategories
+
         # if tags:
         #     filter_dict["tags__id__in"] = tags
+
         if sort == "reviews":
             queryset = (Product.objects
             .prefetch_related("tags", "images", "category")
@@ -105,6 +110,7 @@ class CatalogViewSet(ModelViewSet):
             queryset = self.queryset
         else:
             queryset = self.queryset
+
         if sortType == 'dec':
             sort = f'-{sort}'
 
