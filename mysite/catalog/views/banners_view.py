@@ -1,11 +1,10 @@
-from django.db.models import Min, OuterRef, Subquery, F, Case, When, DecimalField, Value
+from django.db.models import Min, OuterRef, Subquery, F
 from django.db.models.functions import Coalesce
-from rest_framework.fields import FloatField
+
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.viewsets import ModelViewSet
 
-from catalog.models.category_model import Category
 from catalog.serializers.catalogItem_serializer import CatalogItemSerializer
 from catalog.models.product_model import Product
 
@@ -36,7 +35,6 @@ class BannersViewSet(ModelViewSet):
                                    )
 
         return products_with_min_price
-
 
     def list(self, request: Request, *args, **kwargs) -> Response:
         items = self.get_serializer(self.get_queryset(), many=True).data

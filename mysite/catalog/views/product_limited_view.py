@@ -10,6 +10,7 @@ class ProductLimitedViewSet(ModelViewSet):
         Product.objects
         .filter(limited_edition=True)
         .prefetch_related("tags", "images", )
+        .order_by('date')[:16]
     )
     serializer_class = CatalogItemSerializer
 

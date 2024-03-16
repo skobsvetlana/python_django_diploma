@@ -8,10 +8,12 @@ from catalog.models.product_model import Product
 
 from django.shortcuts import get_object_or_404
 
+
 class ProductDetailViewSet(ModelViewSet):
     queryset = (
         Product.objects
-        .prefetch_related("tags", "specifications", "images", "reviews", ).all()
+        .prefetch_related("tags", "specifications", "images", "reviews", )
+        .all()
     )
     serializer_class = ProductFullSerializer
 

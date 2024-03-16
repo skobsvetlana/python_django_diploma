@@ -9,7 +9,7 @@ from catalog.models.specification_model import Specification
 
 class Product(models.Model):
     class Meta:
-        ordering = ["title", "price"]
+        ordering = ["category", "title", "price"]
 
     category = models.ForeignKey(Category, on_delete=models.PROTECT, null=False)
     title = models.CharField(null=False, max_length=100)

@@ -5,11 +5,12 @@ from rest_framework.request import Request
 from catalog.serializers.catalogItem_serializer import CatalogItemSerializer
 from catalog.models.product_model import Product
 
+
 class ProductPopularViewSet(ModelViewSet):
     queryset = (
         Product.objects
         .filter(free_delivery=True)
-        .prefetch_related("tags", "images",)
+        .prefetch_related("tags", "images", )
     )
     serializer_class = CatalogItemSerializer
 
