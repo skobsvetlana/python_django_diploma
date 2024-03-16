@@ -1,6 +1,9 @@
 from django.db import models
 
 class Specification(models.Model):
+    class Meta:
+        ordering = ["name"]
+
     name = models.CharField(max_length=100)
     value = models.CharField(max_length=100)
 

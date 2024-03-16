@@ -66,7 +66,12 @@ class CatalogViewSet(ModelViewSet):
             category_id = self.request.GET["category"]
         except MultiValueDictKeyError:
             category_id = None
-
+        print(self.request.GET)
+        try:
+            tags = self.request.GET["tags[]"]
+        except MultiValueDictKeyError:
+            tags = None
+        print(tags)
         filter_dict = {
             "price__gte": float(minPrice),
             "price__lte": float(maxPrice)
@@ -79,6 +84,8 @@ class CatalogViewSet(ModelViewSet):
         if category_id is not None:
             subcategories = self.get_subcategories(category_id)
             filter_dict["category__id__in"] = subcategories
+        # if tags:
+        #     filter_dict["tags__id__in"] = tags
         if sort == "reviews":
             queryset = (Product.objects
             .prefetch_related("tags", "images", "category")
