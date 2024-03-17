@@ -126,7 +126,7 @@ class CatalogViewSet(ModelViewSet):
         queryset = self.get_queryset()
         limit = self.request.GET["limit"]
 
-        if isinstance(limit, int) and limit > 0:
+        if limit.isdigit() and int(limit) > 0:
             CatalogPagination.page_size = limit
         else:
             print(f"Limit value is not int or <= 0 (limit = {limit})")
