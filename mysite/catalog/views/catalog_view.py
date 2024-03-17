@@ -16,7 +16,7 @@ from catalog.models.product_model import Product
 
 class CatalogPagination(pagination.PageNumberPagination):
     page_size = 20
-    max_page_size = 50
+    max_page_size = 100
 
     def get_paginated_response(self, data):
         return Response(OrderedDict((
@@ -61,7 +61,6 @@ class CatalogViewSet(ModelViewSet):
         sortType = self.request.GET["sortType"]
         freeDelivery = self.request.GET["filter[freeDelivery]"]
         sort = self.request.GET["sort"]
-        limit = self.request.GET["limit"]
 
         try:
             name = self.request.GET["name"].lower()
@@ -125,7 +124,14 @@ class CatalogViewSet(ModelViewSet):
 
     def list(self, request: Request, *args, **kwargs) -> Response:
         queryset = self.get_queryset()
-        print("list", request.GET)
+        limit = self.request.GET["limit"]
+
+        if isinstance(limit, int) and limit > 0:
+            CatalogPagination.page_size = limit
+        else:
+            print(f"Limit value is not int or <= 0 (limit = {limit})")
+            raise ValueError
+
         if queryset.exists():
             page = self.paginate_queryset(queryset)
 
