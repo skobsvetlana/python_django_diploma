@@ -54,6 +54,7 @@ class CatalogViewSet(ModelViewSet):
         return subcategories
 
     def get_queryset(self, *args, **kwargs):
+        queryset = self.queryset
         minPrice = self.request.GET["filter[minPrice]"]
         maxPrice = self.request.GET["filter[maxPrice]"]
         available = self.request.GET["filter[available]"]
@@ -63,16 +64,20 @@ class CatalogViewSet(ModelViewSet):
         limit = self.request.GET["limit"]
 
         try:
+            name = self.request.GET["name"].lower()
+        except MultiValueDictKeyError:
+            name = None
+
+        try:
             category_id = self.request.GET["category"]
         except MultiValueDictKeyError:
             category_id = None
-        print(self.request.GET)
 
         try:
             tags = self.request.GET["tags[]"]
         except MultiValueDictKeyError:
             tags = None
-        print("tags", self.request.GET["tags[]"])
+
         filter_dict = {
             "price__gte": float(minPrice),
             "price__lte": float(maxPrice)
@@ -88,12 +93,15 @@ class CatalogViewSet(ModelViewSet):
             subcategories = self.get_subcategories(category_id)
             filter_dict["category__id__in"] = subcategories
 
-        # if tags:
-        #     filter_dict["tags__id__in"] = tags
+        if name:
+            filter_dict["title__iregex"] = name
 
+        if tags:
+            filter_dict["tags__id__in"] = tags
+            print("tags", self.request.GET["tags[]"])
         if sort == "reviews":
             queryset = (Product.objects
-            .prefetch_related("tags", "images", "category")
+            .prefetch_related("tags", "images", "category", "reviews")
             .annotate(
                 review_count=Count("reviews")
             ))
@@ -107,9 +115,6 @@ class CatalogViewSet(ModelViewSet):
             sort = "avg_rating"
         elif sort == "price":
             sort = "conditional_price"
-            queryset = self.queryset
-        else:
-            queryset = self.queryset
 
         if sortType == 'dec':
             sort = f'-{sort}'
@@ -118,10 +123,9 @@ class CatalogViewSet(ModelViewSet):
 
         return queryset
 
-
     def list(self, request: Request, *args, **kwargs) -> Response:
         queryset = self.get_queryset()
-
+        print("list", request.GET)
         if queryset.exists():
             page = self.paginate_queryset(queryset)
 
