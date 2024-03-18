@@ -78,7 +78,9 @@ class CatalogViewSet(ModelViewSet):
 
         try:
             tags = self.request.GET["tags[]"]
+            print("tags", self.request.GET["tags[]"])
         except MultiValueDictKeyError:
+            # tags = [11, 4, 10]
             tags = None
 
         filter_dict = {
@@ -101,7 +103,10 @@ class CatalogViewSet(ModelViewSet):
 
         if tags:
             filter_dict["tags__id__in"] = tags
-            print("tags", self.request.GET["tags[]"])
+            # queryset = queryset.filter(tags__id__in=tags)
+            # queryset = queryset.annotate(matched_tags_count=Count('tags'))
+            # filter_dict["matched_tags_count"] = len(tags)
+
         if sort == "reviews":
             queryset = (Product.objects
             .prefetch_related("tags", "images", "category", "reviews")

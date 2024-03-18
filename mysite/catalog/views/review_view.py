@@ -21,9 +21,6 @@ class ReviewViewSet(ModelViewSet):
         user = self.request.user
         #product = Product.objects.get(pk=product_id)
 
-        if data["author"] == "":
-            data["author"] = "Anonymous"
-
         data["user"] = user.pk
         data["product"] = product_id
 

@@ -21,3 +21,10 @@ class ReviewsSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("This user has already added a review for this product.")
 
         return data
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if data["author"] == "":
+            data["author"] = "Пользователь предпочёл скрыть свои данные"
+
+        return data
