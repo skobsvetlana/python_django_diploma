@@ -49,12 +49,10 @@ class OrderDetailSerializer(serializers.ModelSerializer):
                     customer = request.__getattribute__("user")
                 except TypeError:
                     customer = instance.customer
-                    print("Type Error: customer is None")
             else:
                 customer = instance.customer
 
             second_last_order = get_second_last_order(customer)
-            print("second_last_order", second_last_order)
 
             if second_last_order:
                 representation["fullName"] = second_last_order.fullName
@@ -84,6 +82,9 @@ class OrderDetailSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+
+
 
 
 

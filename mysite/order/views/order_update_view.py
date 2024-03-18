@@ -24,6 +24,10 @@ class OrderDetailViewSet(ModelViewSet):
         id = kwargs.get("id")
         instance = get_object_or_404(self.queryset, pk=id)
 
+        if instance.status == "paid":
+            raise ValueError(
+                    f"Order №{id} is already paid.")
+
         if instance.customer == None:
             user = User.objects.get(pk=request.user.pk)
             instance.customer = user

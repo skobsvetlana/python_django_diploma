@@ -1,3 +1,5 @@
+from django.core.exceptions import ValidationError
+
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.viewsets import ModelViewSet
@@ -45,10 +47,6 @@ class CartItemViewSet(ModelViewSet):
     def update(self, request: Request, *args, **kwargs) -> Response:
         """
         Обновление корзины и продуктов в ней
-        :param request:
-        :param args:
-        :param kwargs:
-        :return:
         """
         product_id = request.data["id"]
         count = request.data["count"]
@@ -57,14 +55,18 @@ class CartItemViewSet(ModelViewSet):
 
         if request.user.is_authenticated:
             cart, created = Cart.objects.get_or_create(user=request.user)
-            cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+            if product.totalCount > 0:
+                cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
 
-            if int(product.totalCount) > cart_item.count + int(count):
-                cart_item.count += int(count)
+                if int(product.totalCount) > cart_item.count + int(count):
+                    cart_item.count += int(count)
+                else:
+                    cart_item.count = product.totalCount
+
+                cart_item.save()
             else:
-                cart_item.count = product.totalCount
-
-            cart_item.save()
+                raise ValueError(
+                    f"{product} is out of stock.")
 
             cart_items = CartItem.objects.filter(cart=cart)
             serializer = self.get_serializer(cart_items, many=True)
