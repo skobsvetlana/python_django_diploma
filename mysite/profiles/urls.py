@@ -1,6 +1,9 @@
 from django.urls import path, include
 
-from profiles.views import UserProfileViewset, AvatarUpdateViewset
+from profiles.views import (UserProfileViewset,
+                            AvatarUpdateViewset,
+                            ChangePasswordViewSet
+                            )
 
 from rest_framework.routers import DefaultRouter
 
@@ -16,4 +19,5 @@ urlpatterns = [
                                                 'post': 'update',
                                                  })),
     path("profile/avatar", AvatarUpdateViewset.as_view({'post': 'update'})),
+    path("profile/password", ChangePasswordViewSet.as_view({'post': 'update'})),
 ]

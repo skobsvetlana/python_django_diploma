@@ -11,9 +11,9 @@ app_name = "my_auth"
 
 routers = DefaultRouter()
 
-routers.register("sign-in", LoginViewSet, basename="sign-in")
-routers.register("sign-up", UserRegistrationViewSet, basename="sign-up")
-routers.register("sign-out", LogoutViewSet, basename="sign-out")
+# routers.register("sign-in", LoginViewSet, basename="sign-in")
+# routers.register("sign-up", UserRegistrationViewSet, basename="sign-up")
+# routers.register("sign-out", LogoutViewSet, basename="sign-out")
 
 
 urlpatterns = [

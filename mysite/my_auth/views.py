@@ -79,3 +79,6 @@ class UserRegistrationViewSet(viewsets.GenericViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+
+
+

@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from profiles.serializers import (
     ProfileSerializer,
     AvatarUpdateSerializer,
+    ChangePasswordSerializer,
 )
 from profiles.models import Profile
 
@@ -85,6 +86,32 @@ class AvatarUpdateViewset(ModelViewSet):
         return Response(
             data=serializer.data,
             status=status.HTTP_201_CREATED,
+        )
+
+
+class ChangePasswordViewSet(ModelViewSet):
+    serializer_class = ChangePasswordSerializer
+    permission_classes = [IsAuthenticated]
+
+    def update(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        currentPassword = serializer.validated_data.get('currentPassword')
+        newPassword = serializer.validated_data.get('newPassword')
+
+        if not request.user.check_password(currentPassword):
+            print("Wrong password.")
+            return Response(
+                data={"currentPassword": ["Wrong password."]},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        request.user.set_password(newPassword)
+        request.user.save()
+
+        return Response(
+            data={"message": "Password updated successfully."},
+            status=status.HTTP_200_OK
         )
 
 

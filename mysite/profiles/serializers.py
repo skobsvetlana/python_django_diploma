@@ -62,4 +62,15 @@ class AvatarUpdateSerializer(serializers.ModelSerializer):
         return instance
 
 
+class ChangePasswordSerializer(serializers.Serializer):
+    currentPassword = serializers.CharField(required=True)
+    newPassword = serializers.CharField(required=True)
+    # confirmNewPassword = serializers.CharField(required=True)
+
+    # def validate(self, data):
+    #     if data['newPassword'] != data['confirmNewPassword']:
+    #         raise serializers.ValidationError("New passwords not match.")
+    #     return data
+
+
 
