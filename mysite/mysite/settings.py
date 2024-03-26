@@ -59,10 +59,6 @@ INSTALLED_APPS = [
     'order.apps.OrderConfig',
     'payment.apps.PaymentConfig',
     'my_auth.apps.AuthConfig',
-    #'order.apps.OrderConfig',
-
-
-
 ]
 
 MIDDLEWARE = [
