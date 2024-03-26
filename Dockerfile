@@ -9,6 +9,6 @@ RUN poetry config virtualenvs.create false --local
 COPY pyproject.toml poetry.lock ./
 RUN poetry install
 
-COPY mysite/mysite .
+COPY mysite .
 
 CMD ["gunicorn", "mysite.wsgi:application", "--bind", "0.0.0.0:8000"]
