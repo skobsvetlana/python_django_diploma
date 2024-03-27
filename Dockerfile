@@ -9,6 +9,7 @@ RUN poetry config virtualenvs.create false --local
 COPY pyproject.toml poetry.lock ./
 RUN poetry install
 
+COPY diploma-frontend .
 COPY mysite .
 
 CMD ["gunicorn", "mysite.wsgi:application", "--bind", "0.0.0.0:8000"]
