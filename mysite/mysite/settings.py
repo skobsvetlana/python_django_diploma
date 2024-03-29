@@ -51,7 +51,6 @@ INSTALLED_APPS = [
     'frontend',
     'rest_framework',
     'django_filters',
-    'mptt',
 
     'catalog.apps.CatalogConfig',
     'cart.apps.CartConfig',
@@ -161,8 +160,8 @@ LOGLEVEL = getenv("DJANGO_LOGLEVEL", "info").upper()
 logging.config.dictConfig({
     "version": 1,
     "disable_existing_loggers": False,
-    "formstters": {
-        "consile": {
+    "formatters": {
+        "console": {
             "format": "%(asctime)s %(levelname)s [%(name)s:%(lineno)s] %(module)s %(message)s",
         },
     },
@@ -176,7 +175,7 @@ logging.config.dictConfig({
         "": {
             "level": LOGLEVEL,
             "handlers": [
-                "concole",
+                "console",
             ]
         },
     },
