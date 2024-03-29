@@ -27,5 +27,5 @@ urlpatterns = [
 ]
 ```
 Если запустить сервер разработки: `python manage.py runserver`, то по адресу `127.0.0.1:8000` должна открыться стартовая страница интернет-магазина:
-![image](./root-page.png)
+![image](../mysite/root-page.png)
 

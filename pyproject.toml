@@ -19,7 +19,6 @@ pillow = "^10.2.0"
 pytz = "^2024.1"
 sqlparse = "^0.4.4"
 typing-extensions = "^4.10.0"
-diploma-frontend = {path = "diploma-frontend/dist/diploma-frontend-0.6.tar.gz"}
 
 
 [build-system]
