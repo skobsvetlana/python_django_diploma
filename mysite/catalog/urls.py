@@ -19,9 +19,9 @@ routers.register("catalog", CatalogViewSet, basename="catalog")
 routers.register("categories", CategoryViewSet)
 routers.register("tags", TagViewSet)
 routers.register("products/popular", ProductPopularViewSet)
-routers.register("products/limited", ProductLimitedViewSet)
+routers.register("products/limited", ProductLimitedViewSet, basename="product_limited")
 routers.register("sales", SalesViewSet)
-routers.register("banners", BannersViewSet)
+routers.register("banners", BannersViewSet, basename="banners")
 
 urlpatterns = [
     path("", include(routers.urls)),
