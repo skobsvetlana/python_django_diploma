@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 import logging.config
+import os
 from pathlib import Path
 from os import getenv
 
@@ -30,8 +31,8 @@ SECRET_KEY = getenv(
 )
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = getenv("DJANGO_DEBUG", "0") == "1"
-
+# DEBUG = getenv("DJANGO_DEBUG", "0") == "1"
+DEBUG = 1
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "0.0.0.0,"
@@ -136,6 +137,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'uploads'
