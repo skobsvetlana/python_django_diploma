@@ -12,6 +12,10 @@ from order.serializers.order_update_serializer import OrderDetailSerializer
 
 
 class OrderDetailViewSet(ModelViewSet):
+    """
+    ViewSet для работы с деталями заказа.
+    Предоставляет методы для просмотра, обновления и извлечения информации о заказах.
+    """
     permission_classes = [IsAuthenticated]
     queryset = (Order.objects
                 .prefetch_related("customer", "address", "city", )
@@ -21,6 +25,11 @@ class OrderDetailViewSet(ModelViewSet):
 
 
     def update(self, request: Request, *args, **kwargs):
+        """
+        Обновляет информацию о заказе.
+        Проверяет, что заказ еще не оплачен и обновляет его статус на 'accepted'.
+        Если заказ не имеет клиента, устанавливает текущего пользователя в качестве клиента.
+        """
         id = kwargs.get("id")
         instance = get_object_or_404(self.queryset, pk=id)
 
@@ -50,6 +59,9 @@ class OrderDetailViewSet(ModelViewSet):
 
 
     def perform_update(self, serializer):
+        """
+        Выполняет обновление заказа, создавая или обновляя связанные объекты City и Address.
+        """
         validated_data = serializer.validated_data
         city, created = City.objects.get_or_create(name=validated_data['city'].upper())
         address, created = Address.objects.get_or_create(address1=validated_data['address'].upper())
@@ -59,6 +71,10 @@ class OrderDetailViewSet(ModelViewSet):
 
 
     def retrieve(self, request: Request, *args, **kwargs) -> Response:
+        """
+        Извлекает информацию о заказе по его идентификатору.
+        Использует идентификатор из URL или из сессии, если он не указан в URL.
+        """
         try:
             order_id = kwargs.get("id")
         except TypeError:

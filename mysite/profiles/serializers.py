@@ -6,6 +6,9 @@ from rest_framework import serializers
 from profiles.models import Profile
 
 class ProfileSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для модели Profile.
+    """
     queryset = User.objects.all()
     username = serializers.CharField(
         source='user.username',
@@ -34,7 +37,8 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         """
-        Update and return an existing `Profile` instance, given the validated data.
+        Обновляет существующий экземпляр класса Profile на основе переданных данных.
+        Он обновляет имя пользователя, электронную почту, телефон и аватар.
         """
         instance.user.first_name = validated_data['user']['first_name']
         instance.user.email = validated_data['user']['email']
@@ -45,6 +49,9 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class AvatarUpdateSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для обновления аватара пользователя.
+    """
     avatar = serializers.ImageField(source="src")
 
     class Meta:
@@ -55,7 +62,8 @@ class AvatarUpdateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         """
-        Update and return an existing `Profile` instance, given the validated data.
+        Переопределяет стандартный метод update для обновления экземпляра модели Profile на
+        основе валидированных данных.
         """
         instance.src = validated_data.get('src', instance.src)
         instance.save()
@@ -63,6 +71,9 @@ class AvatarUpdateSerializer(serializers.ModelSerializer):
 
 
 class ChangePasswordSerializer(serializers.Serializer):
+    """
+    Сериализатор для изменения пароля пользователя.
+    """
     currentPassword = serializers.CharField(required=True)
     newPassword = serializers.CharField(required=True)
     # confirmNewPassword = serializers.CharField(required=True)

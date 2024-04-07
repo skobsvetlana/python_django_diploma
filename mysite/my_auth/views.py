@@ -13,6 +13,9 @@ class LoginViewSet(viewsets.GenericViewSet):
     Осуществляет аутентификацию и логин пользователя.
     """
     def create(self, request, *args, **kwargs):
+        """
+        Аутентифицирует пользователя и выполняет вход в систему.
+        """
         data = json.loads(next(iter(request.data.keys())))
 
         user = authenticate(
@@ -41,6 +44,9 @@ class LogoutViewSet(viewsets.GenericViewSet):
     """
 
     def update(self, request, *args, **kwargs):
+        """
+        Выполняет выход из системы, очищая сессию пользователя.
+        """
         # Вызов стандартного метода logout Django, который очищает сессию пользователя
         logout(request)
         return Response(
@@ -51,12 +57,14 @@ class LogoutViewSet(viewsets.GenericViewSet):
 
 class UserRegistrationViewSet(viewsets.GenericViewSet):
     """
-    Creates a new user, authenticates and logs him in.
+    Создает нового пользователя, аутентифицирует и выполняет вход в систему.
     """
-
     serializer_class = UserRegistrationSerializer
 
     def create(self, request, *args, **kwargs):
+        """
+        Регистрирует нового пользователя, аутентифицирует и выполняет вход в систему.
+        """
         data = json.loads(next(iter(request.data.keys())))
 
         serializer = self.get_serializer(data=data)

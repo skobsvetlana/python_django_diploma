@@ -10,6 +10,12 @@ from order.models import (
 
 
 def get_second_last_order(user):
+    """
+    Получает второй последний заказ пользователя.
+
+    :param user: Пользователь, для которого нужно получить заказ.
+    :return: Второй последний заказ пользователя или None, если заказов нет.
+    """
     try:
         second_last_order = Order.objects.filter(customer=user).order_by('-createdAt')[1]
         print("This is not the first order")
@@ -34,6 +40,12 @@ class OrderItemSerializer(serializers.ModelSerializer):
         ]
 
     def to_representation(self, instance):
+        """
+        Преобразует объект OrderItem в словарь для сериализации.
+
+        :param instance: Объект OrderItem.
+        :return: Словарь с данными продукта.
+        """
         data = CatalogItemSerializer(instance.product).data
         data['count'] = instance.count
         data['price'] = instance.price
@@ -56,6 +68,12 @@ class OrderSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
+        """
+        Создает новый заказ с продуктами.
+
+        :param validated_data: Данные для создания заказа.
+        :return: Созданный заказ.
+        """
         order_items = validated_data.pop("products", [])
         order = Order.objects.create(**validated_data)
 

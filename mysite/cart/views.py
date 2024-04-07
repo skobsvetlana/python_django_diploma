@@ -16,12 +16,26 @@ from cart.serializers.cart_not_authenticatad_user_serializer import (
 
 
 def find_index_by_key(data, key, value):
+    """
+    Находит индекс элемента в списке словарей по ключу и значению.
+
+    :param data: Список словарей.
+    :param key: Ключ для поиска.
+    :param value: Значение для поиска.
+    :return: Индекс найденного элемента или None, если элемент не найден.
+    """
     for index, item in enumerate(data):
         if key in item and item[key] == value:
             return index
 
 
 def filter_data(data):
+    """
+    Фильтрует данные, оставляя только ключи "id" и "count".
+
+    :param data: Список словарей для фильтрации.
+    :return: Фильтрованный список словарей.
+    """
     keys = ["id", "count"]
     data = [{key: item.get(key, None) for key in keys} for item in data]
 
@@ -32,11 +46,17 @@ def filter_data(data):
 
 
 class CartViewSet(ModelViewSet):
+    """
+    ViewSet для работы с корзиной.
+    """
     serializer_class = CartSerializer
     queryset = Cart.objects.all()
 
 
 class CartItemViewSet(ModelViewSet):
+    """
+    ViewSet для работы с элементами корзины.
+    """
     serializer_class = CartItemSerializer
     queryset = CartItem.objects.all()
 
@@ -87,6 +107,9 @@ class CartItemViewSet(ModelViewSet):
 
 
     def list(self, request: Request, *args, **kwargs) -> Response:
+        """
+        Получение списка элементов корзины.
+        """
         if request.user.is_authenticated:
             serializer = self.get_serializer(self.get_queryset(), many=True)
         else:
@@ -104,6 +127,9 @@ class CartItemViewSet(ModelViewSet):
 
 
     def destroy(self, request: Request, *args, **kwargs):
+        """
+        Уменьшает количество товара в корзине. Удаляет в случае, если его количесво уменьшается до нуля.
+        """
         product_id = request.data["id"]
         count = request.data["count"]
         product = Product.objects.get(id=product_id)

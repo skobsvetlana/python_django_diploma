@@ -4,6 +4,9 @@ from rest_framework.validators import UniqueValidator
 from django.contrib.auth.models import User
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для регистрации пользователя.
+    """
     username = serializers.CharField(
         validators=[UniqueValidator(queryset=User.objects.all())]
     )
@@ -20,6 +23,9 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
+        """
+        Создает нового пользователя с данными из validated_data.
+        """
         user = User.objects.create_user(
             first_name=validated_data["first_name"],
             username=validated_data["username"],

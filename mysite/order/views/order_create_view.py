@@ -9,6 +9,12 @@ from order.serializers.order_create_serializer import OrderSerializer
 from order.serializers.order_update_serializer import OrderDetailSerializer
 
 def filter_data(data):
+    """
+    Фильтрует данные, оставляя только ключи 'id', 'count', 'price' и переименовывает ключ 'id' в 'product'.
+
+    :param data: Список словарей, содержащих данные.
+    :return: Список словарей с отфильтрованными данными.
+    """
     keys = ["id", "count", "price"]
     data = [{key: item.get(key, None) for key in keys} for item in data]
 
@@ -19,9 +25,17 @@ def filter_data(data):
 
 
 class OrderViewSet(ModelViewSet):
+    """
+    ViewSet для работы с заказами.
+    """
     queryset = Order.objects.all()
 
     def get_serializer_class(self):
+        """
+        Возвращает сериализатор в зависимости от метода запроса.
+
+        :return: Класс сериализатора.
+        """
         if self.request.method == 'POST':
             return OrderSerializer
         elif self.request.method == 'GET':
@@ -29,6 +43,11 @@ class OrderViewSet(ModelViewSet):
 
 
     def get_queryset(self):
+        """
+        Возвращает QuerySet заказов для текущего пользователя.
+
+        :return: QuerySet заказов.
+        """
         queryset = (
             Order.objects
             .select_related("customer", "address")
@@ -38,6 +57,14 @@ class OrderViewSet(ModelViewSet):
 
 
     def create(self, request, *args, **kwargs):
+        """
+        Создает новый заказ.
+
+        :param request: Запрос на создание заказа.
+        :param args: Дополнительные аргументы.
+        :param kwargs: Дополнительные именованные аргументы.
+        :return: Ответ с ID созданного заказа.
+        """
         order_id = request.session.get('order_id')
 
         if order_id is not None:
@@ -70,7 +97,11 @@ class OrderViewSet(ModelViewSet):
 
 
     def perform_create(self, serializer):
-        # Создание заказа и его связь с пользователем, если он зарегистрирован
+        """
+        Создание заказа и его связь с пользователем, если он зарегистрирован
+
+        :param serializer: Сериализатор для создания заказа.
+        """
         user = self.request.user
         city, created = City.objects.get_or_create(name="")
         address, created = Address.objects.get_or_create(
@@ -91,6 +122,14 @@ class OrderViewSet(ModelViewSet):
 
 
     def list(self, request: Request, *args, **kwargs) -> Response:
+        """
+        Возвращает список заказов для текущего пользователя.
+
+        :param request: Запрос на получение списка заказов.
+        :param args: Дополнительные аргументы.
+        :param kwargs: Дополнительные именованные аргументы.
+        :return: Ответ с данными заказов.
+        """
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)

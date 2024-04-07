@@ -14,7 +14,7 @@ from cart.models import (
 class CartItemSerializer(serializers.ModelSerializer):
     """
     Сериализатор для представления продукта в корзине, для зарегистрированных
-    пользователей
+    пользователей. Включает информацию о продукте и количестве его в корзине.
     """
     #sub_total = serializers.SerializerMethodField(method_name="total")
 
@@ -31,6 +31,10 @@ class CartItemSerializer(serializers.ModelSerializer):
 
 
     def to_representation(self, instance):
+        """
+        Переопределение метода to_representation для добавления дополнительной
+        информации о продукте, таких как цена со скидкой, если она есть.
+        """
         data = CatalogItemSerializer(instance.product).data
         data['count'] = instance.count
         sale_item = SaleItem.objects.filter(product=instance.product).first()
@@ -44,7 +48,8 @@ class CartItemSerializer(serializers.ModelSerializer):
 class CartSerializer(serializers.ModelSerializer):
     """
     Сериализатор для представления корзины и продуктов в ней, для зарегистрированных
-    пользователей
+    пользователей. Включает информацию о корзине, такую как общий итог и список
+    продуктов.
     """
     #id = serializers.UUIDField(read_only=True)
     items = CartItemSerializer(many=True, read_only=True)
@@ -62,6 +67,9 @@ class CartSerializer(serializers.ModelSerializer):
 
 
     def main_total(self, cart: Cart):
+        """
+        Вычисление общего итога корзины, суммируя цены всех продуктов в корзине.
+        """
         items = cart.items.all()
         total = sum([item.count * item.product.price for item in items])
         return total

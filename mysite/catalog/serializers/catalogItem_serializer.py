@@ -8,6 +8,7 @@ from catalog.serializers.tag_serializer import TagSerializer
 
 
 class CatalogItemSerializer(serializers.ModelSerializer):
+    """Сериализатор для элементов каталога продуктов."""
     images = ImagesSerializer(many=True, required=True)
     tags = TagSerializer(many=True, required=False)
     count = serializers.SerializerMethodField(method_name="get_count")
@@ -34,21 +35,27 @@ class CatalogItemSerializer(serializers.ModelSerializer):
         ]
 
     def get_count(self, product: Product):
+        """Возвращает общее количество продукта."""
         return product.totalCount
 
     def get_price(self, product: Product):
+        """Возвращает цену продукта."""
         return float(product.price)
 
     def date_to_string(self, product: Product):
+        """Преобразует дату продукта в строку."""
         return product.date.strftime("%a %b %d %Y %H:%M:%S GMT%z %Z")
 
     def get_freeDelivery(self, product: Product):
+        """Возвращает информацию о бесплатной доставке продукта."""
         return product.free_delivery
 
     def get_reviews(self, product: Product):
+        """Возвращает количество отзывов на продукт."""
         return product.reviews_count
 
     def to_representation(self, instance):
+        """Переопределение метода для изменения представления данных."""
         data = super().to_representation(instance)
         sale_item = SaleItem.objects.filter(product=instance.pk).first()
 

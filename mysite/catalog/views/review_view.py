@@ -9,6 +9,10 @@ from catalog.models.product_model import Review, Product
 
 
 class ReviewViewSet(ModelViewSet):
+    """
+    ViewSet для работы с отзывами (Review).
+    Предоставляет возможность создавать отзывы, связанные с определенным продуктом.
+    """
     queryset = Review.objects.prefetch_related("author", "product",).all()
     serializer_class = ReviewsSerializer
     permission_classes = (IsAuthenticated,)
@@ -16,6 +20,15 @@ class ReviewViewSet(ModelViewSet):
 
 
     def create(self, request, *args, **kwargs):
+        """
+        Создает новый отзыв. Принимает данные отзыва, включая ID продукта и ID пользователя, и сохраняет
+        их в базе данных.
+
+        :param request: Запрос на создание отзыва.
+        :param args: Дополнительные аргументы.
+        :param kwargs: Дополнительные именованные аргументы.
+        :return: Ответ с созданным отзывом и статусом 201 Created.
+        """
         product_id = kwargs["id"]
         data = request.data
         user = self.request.user

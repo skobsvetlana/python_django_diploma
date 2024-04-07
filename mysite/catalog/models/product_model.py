@@ -8,6 +8,9 @@ from catalog.models.tag_model import Tag
 from catalog.models.specification_model import Specification
 
 class Product(models.Model):
+    """
+    Модель продукта с различными атрибутами и связями.
+    """
     class Meta:
         ordering = ["category", "title", "price"]
 
@@ -24,6 +27,9 @@ class Product(models.Model):
 
     @property
     def description(self) -> str:
+        """
+        Возвращает описание продукта, обрезанное до 50 символов, если оно превышает эту длину.
+        """
         if len(self.fullDescription) < 50:
             return self.fullDescription
         else:
@@ -31,6 +37,9 @@ class Product(models.Model):
 
     @property
     def reviews_count(self):
+        """
+        Возвращает количество отзывов для данного продукта.
+        """
         reviews = Review.objects.filter(product=self)
         if reviews:
             return reviews.count()
@@ -38,12 +47,18 @@ class Product(models.Model):
 
     @property
     def rating(self):
+        """
+        Вычисляет среднюю оценку отзывов для данного продукта.
+        """
         rating = Review.objects.filter(product=self).aggregate(models.Avg('rate'))['rate__avg']
         if rating:
             rating = round(rating, 1)
         return rating
 
     def __str__(self) -> str:
+        """
+        Возвращает строковое представление продукта.
+        """
         return self.title
 
     # def get_absolute_url(self):
@@ -51,6 +66,9 @@ class Product(models.Model):
 
 
 class Review(models.Model):
+    """
+    Модель отзыва, связанная с продуктом.
+    """
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     text = models.TextField(null=False, blank=True)
     rate = models.PositiveSmallIntegerField(null=False, blank=False, default=0)

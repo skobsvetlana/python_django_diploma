@@ -4,6 +4,12 @@ from order.models import Order
 from order.serializers.order_create_serializer import OrderItemSerializer
 
 def get_second_last_order(user):
+    """
+    Получает второй последний заказ пользователя.
+
+    :param user: Пользователь, для которого нужно найти второй последний заказ.
+    :return: Второй последний заказ пользователя или None, если такого заказа нет.
+    """
     try:
         second_last_order = Order.objects.filter(customer=user).order_by('-createdAt')[1]
     except IndexError:
@@ -40,6 +46,12 @@ class OrderDetailSerializer(serializers.ModelSerializer):
 
 
     def to_representation(self, instance):
+        """
+        Переопределение метода to_representation для добавления дополнительной логики.
+
+        :param instance: Экземпляр модели Order.
+        :return: Словарь с данными заказа.
+        """
         representation = super().to_representation(instance)
         if self.context.get('view').action != 'list':
 
@@ -70,7 +82,11 @@ class OrderDetailSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         """
-        Изменяет и возвращает данные получателе заказа.
+        Изменяет и возвращает данные получателя заказа.
+
+        :param instance: Экземпляр модели Order для обновления.
+        :param validated_data: Данные для обновления.
+        :return: Обновленный экземпляр модели Order.
         """
         instance.fullName = validated_data.get('fullName', instance.fullName)
         instance.email = validated_data.get('email', instance.email)

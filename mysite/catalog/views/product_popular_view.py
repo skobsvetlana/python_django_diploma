@@ -8,6 +8,24 @@ from catalog.models.product_model import Product
 
 
 class ProductPopularViewSet(ModelViewSet):
+    """
+     ViewSet для отображения популярных товаров.
+     Этот класс использует ModelViewSet для предоставления стандартных
+     действий CRUD (создание, чтение, обновление, удаление) для модели Product.
+     Он также включает в себя сортировку товаров по общему доходу и количеству продаж, чтобы
+     показать наиболее популярные товары.
+
+     Атрибуты:
+     - queryset: Запрос к базе данных, который выбирает товары с учетом
+       их популярности, используя аннотации для расчета общего дохода и
+       количества продаж.
+     - serializer_class: Сериализатор, который определяет, как модель Product
+       будет преобразована в JSON для отправки в ответе API.
+
+     Методы:
+     - list: Переопределенный метод для отображения списка товаров,
+       включая пагинацию и сортировку.
+     """
     queryset = (
         Product.objects
         .prefetch_related("tags", "images", )
@@ -23,6 +41,19 @@ class ProductPopularViewSet(ModelViewSet):
     serializer_class = CatalogItemSerializer
 
     def list(self, request: Request, *args, **kwargs) -> Response:
+        """
+        Отображает список популярных товаров с сортировкой.
+        Этот метод переопределяет стандартный метод list для ModelViewSet,
+        чтобы включить в себя пагинацию и сортировку товаров по общему доходу
+        и количеству продаж. Он также использует сериализатор для преобразования
+        данных модели в формат JSON.
+
+        Параметры:
+        - request: Объект запроса, содержащий информацию о запросе клиента.
+
+        Возвращает:
+        - Response: Ответ API, содержащий список популярных товаров в формате JSON.
+        """
         items = self.get_serializer(self.queryset, many=True).data
-        print(len(self.queryset))
+
         return Response(items)

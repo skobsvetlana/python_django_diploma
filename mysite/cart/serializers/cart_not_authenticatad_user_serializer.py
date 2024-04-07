@@ -9,7 +9,8 @@ from catalog.serializers.tag_serializer import TagSerializer
 class CartItemUserNotAuthenticatedSerializer(serializers.ModelSerializer):
     """
     Сериализатор для представления продукта в корзине, для незарегистрированных
-    пользователей
+    пользователей. Включает информацию о продукте, такую как изображения, теги,
+    количество на складе, информацию о бесплатной доставке, отзывы и рейтинг.
     """
     images = ImagesSerializer(many=True, required=True)
     tags = TagSerializer(many=True, required=False)
@@ -35,15 +36,28 @@ class CartItemUserNotAuthenticatedSerializer(serializers.ModelSerializer):
         ]
 
     def get_count(self, product: Product):
+        """
+        Возвращает общее количество продукта на складе.
+        """
         return product.totalCount
 
     def get_freeDelivery(self, product: Product):
+        """
+        Возвращает информацию о бесплатной доставке для продукта.
+        """
         return product.free_delivery
 
     def get_reviews(self, product: Product):
+        """
+        Возвращает количество отзывов для продукта.
+        """
         return product.reviews_count
 
     def to_representation(self, instance):
+        """
+        Переопределение метода to_representation для корректировки данных
+        продукта в зависимости от контекста запроса.
+        """
         data = super().to_representation(instance)
 
         if self.context.get('view').action == 'list':

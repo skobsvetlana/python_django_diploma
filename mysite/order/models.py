@@ -6,6 +6,16 @@ from catalog.models.product_model import Product
 
 
 class DeliveryCost(models.Model):
+    """
+    Модель для хранения стоимости доставки.
+
+    Атрибуты:
+    - ordinary: Стоимость обычной доставки.
+    - express: Стоимость экспресс-доставки.
+    - minCostForFreeDelivery: Минимальная стоимость заказа, при которой доставка бесплатна.
+    - dateFrom: Дата начала действия стоимости доставки.
+    - dateTo: Дата окончания действия стоимости доставки.
+    """
     ordinary = models.DecimalField(null=False, max_digits=10, decimal_places=2, default=0)
     express = models.DecimalField(null=False, max_digits=10, decimal_places=2, default=0)
     minCostForFreeDelivery = models.DecimalField(null=False, max_digits=10, decimal_places=2, default=0)
@@ -14,6 +24,12 @@ class DeliveryCost(models.Model):
 
 
 class City(models.Model):
+    """
+    Модель для хранения информации о городах.
+
+    Атрибуты:
+    - name: Название города.
+    """
     name = models.CharField(
         null=False,
         blank=True,
@@ -25,6 +41,14 @@ class City(models.Model):
 
 
 class Address(models.Model):
+    """
+    Модель для хранения информации об адресах доставки.
+
+    Атрибуты:
+    - address1: Первая строка адреса.
+    - address2: Вторая строка адреса.
+    - zip_code: Почтовый индекс.
+    """
     class Meta:
         verbose_name = "Shipping Address"
         verbose_name_plural = "Shipping Addresses"
@@ -52,7 +76,26 @@ class Address(models.Model):
 
 
 class Order(models.Model):
+    """
+    Модель для хранения информации о заказах.
+
+    Атрибуты:
+    - createdAt: Дата и время создания заказа.
+    - customer: Ссылка на пользователя, сделавшего заказ.
+    - fullName: Полное имя клиента.
+    - email: Электронная почта клиента.
+    - phone: Телефон клиента.
+    - deliveryType: Тип доставки.
+    - paymentType: Тип оплаты.
+    - status: Статус заказа.
+    - address: Ссылка на адрес доставки.
+    - city: Ссылка на город доставки.
+    """
     class Status(models.TextChoices):
+        """
+        Этот класс определяет возможные статусы заказа. Каждый статус представлен в виде пары ключ-значение,
+        где ключ - это имя статуса, а значение - это строка, которая будет сохраняться в базе данных.
+        """
         CREATED = 'created',
         PAID = 'paid',
         ACCEPTED = 'accepted',
@@ -60,11 +103,17 @@ class Order(models.Model):
 
 
     class PaymentType(models.TextChoices):
+        """
+        Этот класс определяет типы оплаты заказа.
+        """
         CARD = 'online',
         RANDOM_ACCOUNT = 'someone',
 
 
     class DeliveryType(models.TextChoices):
+        """
+        Этот класс определяет типы доставки заказа.
+        """
         ORDINARY = 'ordinary',
         EXPRESS = 'express',
 
@@ -99,6 +148,15 @@ class Order(models.Model):
 
 
     def __str__(self):
+        """
+        Возвращает строковое представление объекта заказа.
+
+        Возвращает строку, содержащую номер заказа и его статус.
+
+        Returns:
+            str: Строка вида 'Order №{number} status {status}', где {number} - номер заказа,
+                {status} - статус заказа.
+        """
         return 'Order №{number} status {status}'.format(
             number=self.pk,
             status=self.status,
@@ -106,12 +164,28 @@ class Order(models.Model):
 
     @property
     def totalCost(self):
+        """
+        Вычисляет общую стоимость заказа.
+
+        Складывает стоимость всех товаров в заказе.
+
+        Returns:
+            float: Общая стоимость заказа.
+        """
         total = sum(item.get_cost() for item in self.products.all())
         return total if total is not None else 0
 
 
     @property
     def deliveryCost(self):
+        """
+        Вычисляет стоимость доставки заказа.
+
+        Стоимость доставки зависит от общей стоимости заказа и выбранного типа доставки.
+
+        Returns:
+            float: Стоимость доставки заказа.
+        """
         delivery = 0
         delivery_costs = DeliveryCost.objects.order_by("-dateFrom").first()
 
@@ -131,6 +205,15 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
+    """
+    Модель для хранения информации о товарах в заказе.
+
+    Атрибуты:
+    - order: Ссылка на заказ.
+    - product: Ссылка на товар.
+    - count: Количество товара в заказе.
+    - price: Цена товара.
+    """
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='products')
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='order_item')
     count = models.PositiveIntegerField(null=False)
