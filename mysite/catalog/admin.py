@@ -20,6 +20,16 @@ def limited_addition_off(modelAdmin: admin.ModelAdmin, request: HttpRequest, que
     querryset.update(limited_edition=False)
 
 
+@admin.action(description="Add to banners")
+def add_to_banners(modelAdmin: admin.ModelAdmin, request: HttpRequest, querryset: QuerySet):
+    querryset.update(banner=True)
+
+
+@admin.action(description="Remove from banners")
+def remove_from_banners(modelAdmin: admin.ModelAdmin, request: HttpRequest, querryset: QuerySet):
+    querryset.update(banner=False)
+
+
 class TagInline(admin.TabularInline):
     model = Product.tags.through
 
@@ -77,11 +87,15 @@ class SaleItemAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = "pk", "title", "parent", "src", "alt"
+    actions = [
+        add_to_banners,
+        remove_from_banners,
+    ]
+    list_display = "pk", "banner", "title", "parent", "src", "alt"
     list_display_links = "pk", "title"
 
     fieldsets = (
-        ('Основная информация', {'fields': ('title', 'parent')}),
+        ('Основная информация', {'fields': ('title', 'parent', 'banner',)}),
         ('Фотография', {'fields': ('src', 'alt',)})
     )
 

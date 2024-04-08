@@ -32,6 +32,7 @@ class Category(models.Model):
     title = models.CharField(max_length=150, null=False)
     src = models.ImageField(default="pics/daisy.jpeg", upload_to=category_image_directory_path)
     alt = models.CharField(max_length=200, null=False, blank=True)
+    banner = models.BooleanField(default=False)
     parent = models.ForeignKey(
         "self",
         on_delete=models.CASCADE,

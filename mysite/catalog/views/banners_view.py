@@ -40,6 +40,7 @@ class BannersViewSet(ModelViewSet):
         Функция возвращает запрос к базе данных, который выбирает продукты с минимальной ценной в каждой категории.
         Использует подзапросы для вычисления минимальной цены в каждой категории и фильтрации продуктов по этой цене.
         """
+
         min_price_subquery = (self.queryset
                               .filter(category=OuterRef('category'))
                               .values('category')
@@ -49,6 +50,7 @@ class BannersViewSet(ModelViewSet):
         products_with_min_price = (self.queryset
                                    .annotate(min_price_in_category=Subquery(min_price_subquery))
                                    .filter(conditional_price=F('min_price_in_category'))
+                                   .filter(category__banner=True)
                                    )
 
         return products_with_min_price
@@ -59,5 +61,5 @@ class BannersViewSet(ModelViewSet):
         Возвращает сериализованные данные продуктов в формате JSON.
         """
         items = self.get_serializer(self.get_queryset(), many=True).data
-
+        print(items)
         return Response(items)
