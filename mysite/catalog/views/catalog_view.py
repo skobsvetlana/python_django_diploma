@@ -104,7 +104,6 @@ class CatalogViewSet(ModelViewSet):
         Возвращает:
         - Queryset элементов каталога, отфильтрованный и отсортированный в соответствии с параметрами запроса.
         """
-
         queryset = self.queryset
         minPrice = self.request.GET["filter[minPrice]"]
         maxPrice = self.request.GET["filter[maxPrice]"]
@@ -114,7 +113,7 @@ class CatalogViewSet(ModelViewSet):
         sort = self.request.GET["sort"]
 
         try:
-            name = self.request.GET["name"].lower()
+            name = self.request.GET["filter[name]"].lower()
         except MultiValueDictKeyError:
             name = None
 
@@ -124,10 +123,9 @@ class CatalogViewSet(ModelViewSet):
             category_id = None
 
         try:
-            tags = self.request.GET["tags[]"]
+            tags = self.request.GET.getlist("tags[]")
             print("tags", self.request.GET["tags[]"])
         except MultiValueDictKeyError:
-            # tags = [11, 4, 10]
             tags = None
 
         filter_dict = {

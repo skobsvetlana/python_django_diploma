@@ -53,4 +53,3 @@ class ReviewsSerializer(serializers.ModelSerializer):
             data["author"] = "Пользователь предпочёл скрыть свои данные"
 
         return data
-у4
